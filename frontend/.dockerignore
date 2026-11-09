@@ -7,3 +7,5 @@ playwright-report
 test-results
 .vscode
 .idea
+mock
+contrato

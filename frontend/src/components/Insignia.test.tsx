@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { Insignia } from './Insignia';
-import { describirEstadoStock, type EstadoStock } from '../utils/estadoStock';
+import { describirEstadoStock } from '../utils/estadoStock';
+import type { EstadoStock } from '../api/tipos';
 
 describe('Insignia', () => {
   it.each([
