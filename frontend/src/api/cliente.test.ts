@@ -33,7 +33,7 @@ async function capturarError(promesa: Promise<unknown>): Promise<ErrorApi> {
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchSimulado);
   configurarCliente({ alExpirarSesion, alProhibido });
-  guardarSesion({ token: 'token-de-prueba', expiraEn: '2026-11-10T02:00:00Z', usuario: { id: 1 } });
+  guardarSesion({ token: 'token-de-prueba', expiraEn: '2026-11-10T02:00:00Z' });
 });
 
 afterEach(() => {
