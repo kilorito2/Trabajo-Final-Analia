@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "mock": "node mock/servidor.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
@@ -15,7 +16,9 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "knip": "knip",
-    "api:tipos": "openapi-typescript http://localhost:8080/v3/api-docs -o src/api/esquema.ts"
+    "api:tipos": "openapi-typescript http://localhost:8080/v3/api-docs -o src/api/esquema.ts",
+    "api:tipos:provisorio": "openapi-typescript contrato/openapi-provisorio.yaml -o src/api/esquema.ts",
+    "capturas": "playwright test"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "^5.3.0",
@@ -26,7 +29,9 @@
     "react-router": "^8.5.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
