@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:8080',
+      // API_DESTINO permite usar otro puerto si el 8080 está ocupado.
+      '/api': process.env.API_DESTINO ?? 'http://localhost:8080',
     },
   },
   test: {
