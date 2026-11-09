@@ -22,19 +22,18 @@ export function Modal({
   bloqueado = false,
 }: PropsModal) {
   const dialogo = useRef<HTMLDialogElement>(null);
-  const disparador = useRef<HTMLElement | null>(null);
   const idTitulo = useId();
 
+  // Al cerrarse (o desmontarse) el foco vuelve al elemento que lo abrió.
   useEffect(() => {
     const elemento = dialogo.current;
-    if (!elemento) return;
-    if (abierto && !elemento.open) {
-      disparador.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      elemento.showModal();
-    } else if (!abierto && elemento.open) {
-      elemento.close();
-      disparador.current?.focus();
-    }
+    if (!abierto || !elemento) return;
+    const disparador = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (!elemento.open) elemento.showModal();
+    return () => {
+      if (elemento.open) elemento.close();
+      disparador?.focus();
+    };
   }, [abierto]);
 
   return (

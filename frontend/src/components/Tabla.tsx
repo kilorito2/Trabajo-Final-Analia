@@ -12,6 +12,8 @@ export type Columna<F> = {
   numero?: boolean;
   /** Campo de `sort` que acepta el backend. Solo las columnas con este dato se pueden ordenar. */
   campoOrden?: string;
+  /** Fechas, números de comprobante y textos cortos que no conviene partir en dos renglones. */
+  sinCortar?: boolean;
   /** Para encabezados de columnas de acciones, que no muestran texto. */
   encabezadoOculto?: boolean;
 };
@@ -29,6 +31,11 @@ type PropsTabla<F> = {
   alOrdenar?: (orden: Orden) => void;
   filasEsqueleto?: number;
 };
+
+function clasesCelda(columna: { numero?: boolean; sinCortar?: boolean }): string | undefined {
+  const clases = [columna.numero && 'numero', columna.sinCortar && 'sin-cortar'].filter(Boolean);
+  return clases.length > 0 ? clases.join(' ') : undefined;
+}
 
 function valorAriaSort(columna: { campoOrden?: string }, orden: Orden | null | undefined) {
   if (!columna.campoOrden) return undefined;
@@ -128,7 +135,7 @@ export function Tabla<F>({
             : filas.map((fila) => (
                 <tr key={claveFila(fila)}>
                   {columnas.map((columna) => (
-                    <td key={columna.clave} className={columna.numero ? 'numero' : undefined}>
+                    <td key={columna.clave} className={clasesCelda(columna)}>
                       {columna.celda(fila)}
                     </td>
                   ))}

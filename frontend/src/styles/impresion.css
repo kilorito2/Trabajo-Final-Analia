@@ -29,6 +29,25 @@
   .tabla-contenedor,
   .tarjeta {
     border: 0;
+    overflow: visible;
+  }
+
+  .comprobante {
+    max-width: none;
+    padding: 0;
+  }
+
+  .comprobante__encabezado,
+  .firma {
+    border-color: #000;
+  }
+
+  .comprobante__firmas {
+    margin-top: 25mm;
+  }
+
+  .texto-suave {
+    color: #000;
   }
 
   .tabla th,
