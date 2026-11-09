@@ -1,0 +1,569 @@
+# Contrato PROVISORIO escrito a mano desde Back_v2.md §8, mientras el backend no exista.
+# Cuando el backend esté levantado se reemplaza por su OpenAPI real (`npm run api:tipos`)
+# y se borra este archivo. Imita los nombres que genera springdoc (PagedModel…).
+openapi: 3.1.0
+info:
+  title: Farmacia Hospitalaria (provisorio)
+  version: 0.0.0
+security:
+  - bearer: []
+paths:
+  /api/auth/login:
+    post:
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/LoginRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LoginResponse' } } } }
+  /api/auth/me:
+    get:
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/UsuarioSesion' } } } }
+  /api/auth/me/password:
+    patch:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CambioPasswordRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
+  /api/usuarios:
+    get:
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: activo, in: query, schema: { type: boolean } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelUsuarioResponse' } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/UsuarioRequest' } } } }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/UsuarioResponse' } } } }
+  /api/usuarios/{id}:
+    put:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/UsuarioEdicionRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/UsuarioResponse' } } } }
+  /api/usuarios/{id}/estado:
+    patch:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EstadoRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
+  /api/usuarios/{id}/password:
+    patch:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/RestablecerPasswordRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
+  /api/proveedores:
+    get:
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: activo, in: query, schema: { type: boolean } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelProveedorResponse' } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorRequest' } } } }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorResponse' } } } }
+  /api/proveedores/{id}:
+    get:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorResponse' } } } }
+    put:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorResponse' } } } }
+  /api/proveedores/{id}/estado:
+    patch:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EstadoRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
+  /api/areas:
+    get:
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: activo, in: query, schema: { type: boolean } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelAreaResponse' } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AreaRequest' } } } }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/AreaResponse' } } } }
+  /api/areas/{id}:
+    put:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AreaRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AreaResponse' } } } }
+  /api/areas/{id}/estado:
+    patch:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EstadoRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
+  /api/medicamentos:
+    get:
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { $ref: '#/components/schemas/EstadoStock' } }
+        - { name: activo, in: query, schema: { type: boolean } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelMedicamentoResponse' } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoRequest' } } } }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoResponse' } } } }
+  /api/medicamentos/{id}:
+    get:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoDetalleResponse' } } } }
+    put:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoResponse' } } } }
+  /api/medicamentos/{id}/estado:
+    patch:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EstadoRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
+  /api/medicamentos/{id}/lotes:
+    post:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/IngresoRequest' } } } }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/IngresoResponse' } } } }
+  /api/lotes:
+    get:
+      parameters:
+        - { name: medicamentoId, in: query, schema: { type: integer, format: int64 } }
+        - { name: estado, in: query, schema: { type: array, items: { $ref: '#/components/schemas/EstadoLote' } } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelLoteResponse' } } } }
+  /api/lotes/{id}/baja:
+    post:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/BajaLoteRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LoteResponse' } } } }
+  /api/lotes/{id}/ajuste:
+    post:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/AjusteLoteRequest' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LoteResponse' } } } }
+  /api/movimientos:
+    get:
+      parameters:
+        - { name: loteId, in: query, schema: { type: integer, format: int64 } }
+        - { name: medicamentoId, in: query, schema: { type: integer, format: int64 } }
+        - { name: tipo, in: query, schema: { $ref: '#/components/schemas/TipoMovimiento' } }
+        - { name: desde, in: query, schema: { type: string, format: date } }
+        - { name: hasta, in: query, schema: { type: string, format: date } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelMovimientoResponse' } } } }
+  /api/transferencias:
+    get:
+      parameters:
+        - { name: desde, in: query, schema: { type: string, format: date } }
+        - { name: hasta, in: query, schema: { type: string, format: date } }
+        - { name: areaId, in: query, schema: { type: integer, format: int64 } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelTransferenciaResumen' } } } }
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/TransferenciaRequest' } } } }
+      responses:
+        '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/TransferenciaResponse' } } } }
+  /api/transferencias/{id}:
+    get:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/TransferenciaResponse' } } } }
+  /api/transferencias/exportar:
+    get:
+      parameters:
+        - { name: desde, in: query, required: true, schema: { type: string, format: date } }
+        - { name: hasta, in: query, required: true, schema: { type: string, format: date } }
+        - { name: areaId, in: query, schema: { type: integer, format: int64 } }
+      responses:
+        '200': { description: CSV, content: { text/csv: { schema: { type: string } } } }
+  /api/alertas:
+    get:
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AlertasResponse' } } } }
+  /api/resumen:
+    get:
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/ResumenResponse' } } } }
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    id: { name: id, in: path, required: true, schema: { type: integer, format: int64 } }
+    page: { name: page, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+    size: { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    sort: { name: sort, in: query, schema: { type: string } }
+  schemas:
+    Rol: { type: string, enum: [ADMIN, FARMACEUTICO, CONSULTA] }
+    Permiso: { type: string, enum: [LECTURA, CATALOGO_EDITAR, STOCK_INGRESAR, STOCK_BAJA_AJUSTE, TRANSFERENCIA_CREAR, USUARIO_GESTIONAR] }
+    EstadoStock: { type: string, enum: [SIN_STOCK, STOCK_BAJO, OK] }
+    EstadoLote: { type: string, enum: [VIGENTE, POR_VENCER, VENCIDO, AGOTADO] }
+    TipoMovimiento: { type: string, enum: [INGRESO, EGRESO, BAJA_VENCIMIENTO, AJUSTE] }
+    PageMetadata:
+      type: object
+      required: [number, size, totalElements, totalPages]
+      properties:
+        number: { type: integer }
+        size: { type: integer }
+        totalElements: { type: integer, format: int64 }
+        totalPages: { type: integer }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties: { username: { type: string }, password: { type: string } }
+    LoginResponse:
+      type: object
+      required: [token, expiraEn, usuario]
+      properties:
+        token: { type: string }
+        expiraEn: { type: string, format: date-time }
+        usuario: { $ref: '#/components/schemas/UsuarioSesion' }
+    UsuarioSesion:
+      type: object
+      required: [id, username, nombreCompleto, rol, permisos]
+      properties:
+        id: { type: integer, format: int64 }
+        username: { type: string }
+        nombreCompleto: { type: string }
+        rol: { $ref: '#/components/schemas/Rol' }
+        permisos: { type: array, items: { $ref: '#/components/schemas/Permiso' } }
+    CambioPasswordRequest:
+      type: object
+      required: [passwordActual, passwordNueva]
+      properties:
+        passwordActual: { type: string }
+        passwordNueva: { type: string, minLength: 8, maxLength: 72 }
+    UsuarioRequest:
+      type: object
+      required: [username, nombreCompleto, rol, password]
+      properties:
+        username: { type: string }
+        nombreCompleto: { type: string }
+        rol: { $ref: '#/components/schemas/Rol' }
+        password: { type: string, minLength: 8, maxLength: 72 }
+    UsuarioEdicionRequest:
+      type: object
+      required: [nombreCompleto, rol]
+      properties:
+        nombreCompleto: { type: string }
+        rol: { $ref: '#/components/schemas/Rol' }
+    EstadoRequest:
+      type: object
+      required: [activo]
+      properties: { activo: { type: boolean } }
+    RestablecerPasswordRequest:
+      type: object
+      required: [passwordNueva]
+      properties: { passwordNueva: { type: string, minLength: 8, maxLength: 72 } }
+    UsuarioResponse:
+      type: object
+      required: [id, username, nombreCompleto, rol, activo, creadoEn]
+      properties:
+        id: { type: integer, format: int64 }
+        username: { type: string }
+        nombreCompleto: { type: string }
+        rol: { $ref: '#/components/schemas/Rol' }
+        activo: { type: boolean }
+        creadoEn: { type: string, format: date-time }
+    ProveedorRequest:
+      type: object
+      required: [razonSocial, cuit]
+      properties:
+        razonSocial: { type: string }
+        cuit: { type: string }
+        telefono: { type: [string, 'null'] }
+        email: { type: [string, 'null'] }
+    ProveedorResponse:
+      type: object
+      required: [id, razonSocial, cuit, telefono, email, activo, lotesConStock]
+      properties:
+        id: { type: integer, format: int64 }
+        razonSocial: { type: string }
+        cuit: { type: string }
+        telefono: { type: [string, 'null'] }
+        email: { type: [string, 'null'] }
+        activo: { type: boolean }
+        lotesConStock: { type: integer }
+    AreaRequest:
+      type: object
+      required: [nombre]
+      properties: { nombre: { type: string } }
+    AreaResponse:
+      type: object
+      required: [id, nombre, activo]
+      properties:
+        id: { type: integer, format: int64 }
+        nombre: { type: string }
+        activo: { type: boolean }
+    MedicamentoRequest:
+      type: object
+      required: [codigo, nombre, presentacion, stockMinimo]
+      properties:
+        codigo: { type: string }
+        nombre: { type: string }
+        presentacion: { type: string }
+        stockMinimo: { type: integer, minimum: 0 }
+    MedicamentoResponse:
+      type: object
+      required: [id, codigo, nombre, presentacion, stockMinimo, stockTotal, estadoStock, proximoVencimiento, activo]
+      properties:
+        id: { type: integer, format: int64 }
+        codigo: { type: string }
+        nombre: { type: string }
+        presentacion: { type: string }
+        stockMinimo: { type: integer }
+        stockTotal: { type: integer }
+        estadoStock: { $ref: '#/components/schemas/EstadoStock' }
+        proximoVencimiento: { type: [string, 'null'], format: date }
+        activo: { type: boolean }
+    MedicamentoDetalleResponse:
+      type: object
+      required: [id, codigo, nombre, presentacion, stockMinimo, stockTotal, estadoStock, proximoVencimiento, activo, lotes]
+      properties:
+        id: { type: integer, format: int64 }
+        codigo: { type: string }
+        nombre: { type: string }
+        presentacion: { type: string }
+        stockMinimo: { type: integer }
+        stockTotal: { type: integer }
+        estadoStock: { $ref: '#/components/schemas/EstadoStock' }
+        proximoVencimiento: { type: [string, 'null'], format: date }
+        activo: { type: boolean }
+        lotes: { type: array, items: { $ref: '#/components/schemas/LoteResponse' } }
+    IngresoRequest:
+      type: object
+      required: [proveedorId, numeroLote, fechaVencimiento, cantidad]
+      properties:
+        proveedorId: { type: integer, format: int64 }
+        numeroLote: { type: string }
+        fechaVencimiento: { type: string, format: date }
+        cantidad: { type: integer, minimum: 1 }
+    IngresoResponse:
+      type: object
+      required: [lote, stockTotalResultante]
+      properties:
+        lote: { $ref: '#/components/schemas/LoteResponse' }
+        stockTotalResultante: { type: integer }
+    LoteResponse:
+      type: object
+      required: [id, medicamentoId, medicamento, proveedorId, proveedor, numeroLote, fechaVencimiento, cantidadInicial, cantidadActual, fechaIngreso, estado, diasParaVencer]
+      properties:
+        id: { type: integer, format: int64 }
+        medicamentoId: { type: integer, format: int64 }
+        medicamento: { type: string }
+        proveedorId: { type: integer, format: int64 }
+        proveedor: { type: string }
+        numeroLote: { type: string }
+        fechaVencimiento: { type: string, format: date }
+        cantidadInicial: { type: integer }
+        cantidadActual: { type: integer }
+        fechaIngreso: { type: string, format: date }
+        estado: { $ref: '#/components/schemas/EstadoLote' }
+        diasParaVencer: { type: integer }
+    BajaLoteRequest:
+      type: object
+      required: [motivo]
+      properties: { motivo: { type: string } }
+    AjusteLoteRequest:
+      type: object
+      required: [cantidadNueva, motivo]
+      properties:
+        cantidadNueva: { type: integer, minimum: 0 }
+        motivo: { type: string, minLength: 5, maxLength: 200 }
+    MovimientoResponse:
+      type: object
+      required: [id, fechaHora, tipo, cantidad, saldoResultante, loteId, numeroLote, medicamento, usuario, transferenciaId, motivo]
+      properties:
+        id: { type: integer, format: int64 }
+        fechaHora: { type: string, format: date-time }
+        tipo: { $ref: '#/components/schemas/TipoMovimiento' }
+        cantidad: { type: integer }
+        saldoResultante: { type: integer }
+        loteId: { type: integer, format: int64 }
+        numeroLote: { type: string }
+        medicamento: { type: string }
+        usuario: { type: string }
+        transferenciaId: { type: [integer, 'null'], format: int64 }
+        motivo: { type: [string, 'null'] }
+    ItemTransferenciaRequest:
+      type: object
+      required: [medicamentoId, cantidad]
+      properties:
+        medicamentoId: { type: integer, format: int64 }
+        cantidad: { type: integer, minimum: 1 }
+    TransferenciaRequest:
+      type: object
+      required: [areaId, items]
+      properties:
+        areaId: { type: integer, format: int64 }
+        observaciones: { type: [string, 'null'], maxLength: 500 }
+        items: { type: array, minItems: 1, maxItems: 50, items: { $ref: '#/components/schemas/ItemTransferenciaRequest' } }
+    TransferenciaResumen:
+      type: object
+      required: [id, numero, fechaHora, area, realizadaPor, cantidadItems, unidadesTotales]
+      properties:
+        id: { type: integer, format: int64 }
+        numero: { type: string }
+        fechaHora: { type: string, format: date-time }
+        area: { type: string }
+        realizadaPor: { type: string }
+        cantidadItems: { type: integer }
+        unidadesTotales: { type: integer }
+    AreaRef:
+      type: object
+      required: [id, nombre]
+      properties:
+        id: { type: integer, format: int64 }
+        nombre: { type: string }
+    UsuarioRef:
+      type: object
+      required: [id, nombreCompleto]
+      properties:
+        id: { type: integer, format: int64 }
+        nombreCompleto: { type: string }
+    DetalleTransferenciaResponse:
+      type: object
+      required: [medicamentoId, medicamento, loteId, numeroLote, fechaVencimiento, cantidad]
+      properties:
+        medicamentoId: { type: integer, format: int64 }
+        medicamento: { type: string }
+        loteId: { type: integer, format: int64 }
+        numeroLote: { type: string }
+        fechaVencimiento: { type: string, format: date }
+        cantidad: { type: integer }
+    TransferenciaResponse:
+      type: object
+      required: [id, numero, fechaHora, area, realizadaPor, observaciones, detalle]
+      properties:
+        id: { type: integer, format: int64 }
+        numero: { type: string }
+        fechaHora: { type: string, format: date-time }
+        area: { $ref: '#/components/schemas/AreaRef' }
+        realizadaPor: { $ref: '#/components/schemas/UsuarioRef' }
+        observaciones: { type: [string, 'null'] }
+        detalle: { type: array, items: { $ref: '#/components/schemas/DetalleTransferenciaResponse' } }
+    AlertaMedicamento:
+      type: object
+      required: [medicamentoId, codigo, nombre, presentacion, stockTotal, stockMinimo]
+      properties:
+        medicamentoId: { type: integer, format: int64 }
+        codigo: { type: string }
+        nombre: { type: string }
+        presentacion: { type: string }
+        stockTotal: { type: integer }
+        stockMinimo: { type: integer }
+    AlertaLote:
+      type: object
+      required: [loteId, numeroLote, medicamentoId, medicamento, fechaVencimiento, diasParaVencer, cantidadActual]
+      properties:
+        loteId: { type: integer, format: int64 }
+        numeroLote: { type: string }
+        medicamentoId: { type: integer, format: int64 }
+        medicamento: { type: string }
+        fechaVencimiento: { type: string, format: date }
+        diasParaVencer: { type: integer }
+        cantidadActual: { type: integer }
+    AlertasResponse:
+      type: object
+      required: [diasPorVencer, sinStock, stockBajo, vencidos, porVencer]
+      properties:
+        diasPorVencer: { type: integer }
+        sinStock: { type: array, items: { $ref: '#/components/schemas/AlertaMedicamento' } }
+        stockBajo: { type: array, items: { $ref: '#/components/schemas/AlertaMedicamento' } }
+        vencidos: { type: array, items: { $ref: '#/components/schemas/AlertaLote' } }
+        porVencer: { type: array, items: { $ref: '#/components/schemas/AlertaLote' } }
+    TotalesAlertas:
+      type: object
+      required: [sinStock, stockBajo, vencidos, porVencer]
+      properties:
+        sinStock: { type: integer }
+        stockBajo: { type: integer }
+        vencidos: { type: integer }
+        porVencer: { type: integer }
+    EgresoArea:
+      type: object
+      required: [areaId, area, unidades]
+      properties:
+        areaId: { type: integer, format: int64 }
+        area: { type: string }
+        unidades: { type: integer }
+    ResumenResponse:
+      type: object
+      required: [totales, diasPorVencer, medicamentosActivos, transferenciasHoy, ultimasTransferencias, egresosPorArea]
+      properties:
+        totales: { $ref: '#/components/schemas/TotalesAlertas' }
+        diasPorVencer: { type: integer }
+        medicamentosActivos: { type: integer }
+        transferenciasHoy: { type: integer }
+        ultimasTransferencias: { type: array, items: { $ref: '#/components/schemas/TransferenciaResumen' } }
+        egresosPorArea: { type: array, items: { $ref: '#/components/schemas/EgresoArea' } }
+    PagedModelUsuarioResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/UsuarioResponse' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    PagedModelProveedorResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/ProveedorResponse' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    PagedModelAreaResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/AreaResponse' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    PagedModelMedicamentoResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/MedicamentoResponse' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    PagedModelLoteResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/LoteResponse' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    PagedModelMovimientoResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/MovimientoResponse' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    PagedModelTransferenciaResumen:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/TransferenciaResumen' } }
+        page: { $ref: '#/components/schemas/PageMetadata' }

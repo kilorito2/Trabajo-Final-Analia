@@ -1,0 +1,48 @@
+/* Contrastes verificados contra WCAG AA sobre --color-superficie. */
+:root {
+  --color-fondo: #f5f7f8;
+  --color-superficie: #ffffff;
+  --color-texto: #1f2933; /* 14,8:1 */
+  --color-texto-suave: #52606d; /* 6,5:1 */
+  --color-borde: #d9e2e7; /* solo separadores decorativos */
+  --color-borde-control: #7b8794; /* bordes de campos: 3,7:1 (los controles necesitan 3:1) */
+  --color-primario: #0b5563; /* 8,4:1; el texto blanco encima también da 8,4:1 */
+  --color-primario-hover: #084450;
+  --color-primario-suave: #e3eef0; /* fondo del ítem activo; el primario encima da 7,1:1 */
+  --color-foco: #0b5563;
+
+  --peligro-texto: #9b1c1c;
+  --peligro-fondo: #fdecec;
+  --peligro-solido: #c62828; /* 7,1:1 */
+  --aviso-texto: #7a4b00;
+  --aviso-fondo: #fff4db;
+  --aviso-solido: #b45309; /* 6,8:1 */
+  --ok-texto: #1e6b3a;
+  --ok-fondo: #e6f4ea;
+  --ok-solido: #2e7d32; /* 5,7:1 */
+
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-6: 24px;
+  --esp-8: 32px;
+  --radio: 6px;
+  --sombra: 0 1px 3px rgb(0 0 0 / 0.12); /* solo modales, menús y avisos */
+
+  --fuente: 'IBM Plex Sans', system-ui, sans-serif;
+  --texto-sm: 0.8125rem; /* 13 px: metadatos */
+  --texto-base: 0.9375rem; /* 15 px */
+  --texto-lg: 1.25rem; /* 20 px: título de página */
+
+  --ancho-menu: 224px;
+  --alto-fila: 38px;
+  --alto-barra: 52px;
+  --transicion: 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transicion: 0ms;
+  }
+}
