@@ -3,6 +3,7 @@ package ar.edu.utn.farmacia;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ar.edu.utn.farmacia.auth.JwtProperties;
+import ar.edu.utn.farmacia.demo.PerfilesIncompatibles;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -44,6 +45,28 @@ class ConfiguracionTest {
     conJwt
         .withPropertyValues("farmacia.jwt.secret=" + CLAVE_CORTA + "8")
         .run(contexto -> assertThat(contexto).hasNotFailed().hasSingleBean(JwtProperties.class));
+  }
+
+  @Test
+  void noArrancaConDemoYProdALaVez() {
+    new ApplicationContextRunner()
+        .withPropertyValues("spring.profiles.active=demo,prod")
+        .withUserConfiguration(PerfilesIncompatibles.class)
+        .run(
+            contexto -> {
+              assertThat(contexto).hasFailed();
+              assertThat(contexto.getStartupFailure())
+                  .rootCause()
+                  .hasMessageContaining("'demo' y 'prod'");
+            });
+  }
+
+  @Test
+  void arrancaSoloConDemo() {
+    new ApplicationContextRunner()
+        .withPropertyValues("spring.profiles.active=demo")
+        .withUserConfiguration(PerfilesIncompatibles.class)
+        .run(contexto -> assertThat(contexto).hasNotFailed());
   }
 
   @Configuration(proxyBeanMethods = false)
