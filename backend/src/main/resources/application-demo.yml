@@ -1,0 +1,3 @@
+farmacia:
+  demo:
+    password: ${DEMO_PASSWORD:demo1234}

@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: farmacia-hospitalaria
+  datasource:
+    url: ${DB_URL:}
+    username: ${DB_USER:}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  jackson:
+    time-zone: America/Argentina/Buenos_Aires
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        max-page-size: 100
+        serialization-mode: via-dto
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+farmacia:
+  zona-horaria: America/Argentina/Buenos_Aires
+  jwt:
+    secret: ${JWT_SECRET:}
+    duracion: 8h
+  alertas:
+    dias-por-vencer: 30
+  cors:
+    origenes: ${CORS_ORIGENES:}
+  admin:
+    password: ${ADMIN_PASSWORD:}
