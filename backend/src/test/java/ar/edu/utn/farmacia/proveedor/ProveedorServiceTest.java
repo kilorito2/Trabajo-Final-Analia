@@ -50,7 +50,7 @@ class ProveedorServiceTest {
     new ProveedorService(proveedorRepository).cambiarEstado(1L, false);
 
     assertThat(proveedor.isActivo()).isFalse();
-    verify(proveedorRepository, never()).delete(any());
+    verify(proveedorRepository, never()).delete(any(Proveedor.class));
     verify(proveedorRepository, never()).deleteById(any());
   }
 
