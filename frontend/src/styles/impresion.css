@@ -1,0 +1,44 @@
+@media print {
+  @page {
+    margin: 15mm;
+  }
+
+  html,
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .menu,
+  .barra-superior,
+  .avisos,
+  .saltar-contenido,
+  .no-imprimir {
+    display: none !important;
+  }
+
+  .layout {
+    display: block;
+  }
+
+  .contenido {
+    padding: 0;
+  }
+
+  .tabla-contenedor,
+  .tarjeta {
+    border: 0;
+  }
+
+  .tabla th,
+  .tabla td {
+    border-bottom: 1px solid #000;
+    color: #000;
+  }
+
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+}
