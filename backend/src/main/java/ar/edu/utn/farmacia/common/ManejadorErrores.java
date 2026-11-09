@@ -1,6 +1,7 @@
 package ar.edu.utn.farmacia.common;
 
 import ar.edu.utn.farmacia.auth.CredencialesInvalidasException;
+import ar.edu.utn.farmacia.transferencia.StockInsuficienteException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -47,6 +48,15 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
   ProblemDetail reglaNegocio(ReglaNegocioException ex) {
     return Problemas.crear(
         HttpStatus.CONFLICT, "Operación rechazada", ex.getMessage(), ex.getCodigo());
+  }
+
+  @ExceptionHandler(StockInsuficienteException.class)
+  ProblemDetail stockInsuficiente(StockInsuficienteException ex) {
+    ProblemDetail problema =
+        Problemas.crear(
+            HttpStatus.CONFLICT, "Stock insuficiente", ex.getMessage(), "STOCK_INSUFICIENTE");
+    problema.setProperty("faltantes", ex.getFaltantes());
+    return problema;
   }
 
   @ExceptionHandler(ErrorDeCampoException.class)
