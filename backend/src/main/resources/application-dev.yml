@@ -1,0 +1,8 @@
+# Desarrollo local contra la base del docker-compose.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/farmacia}
+    username: ${DB_USER:farmacia}
+    password: ${DB_PASSWORD:farmacia}
+  jpa:
+    show-sql: true
