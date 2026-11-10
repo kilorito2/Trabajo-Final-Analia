@@ -38,7 +38,7 @@ public class MedicamentoController {
     return medicamentoService.listar(new FiltroMedicamentos(q, estado, activo), pagina);
   }
 
-  /** Reporte de stock en CSV (para Excel) o PDF, con los filtros del listado. */
+  /** Reporte de stock en Excel (XLSX), CSV o PDF, con los filtros del listado. */
   @GetMapping("/exportar")
   @PreAuthorize("hasAuthority('LECTURA')")
   public ResponseEntity<byte[]> exportar(

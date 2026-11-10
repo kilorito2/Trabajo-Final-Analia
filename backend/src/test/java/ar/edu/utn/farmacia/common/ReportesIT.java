@@ -10,9 +10,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import ar.edu.utn.farmacia.IntegracionBase;
 import ar.edu.utn.farmacia.auth.Rol;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -41,6 +50,33 @@ class ReportesIT extends IntegracionBase {
             "Código;Nombre;Presentación;Stock total;Stock mínimo;Próximo vencimiento;Estado;Activo");
     assertThat(lineas).hasSize(2);
     assertThat(lineas.get(1)).startsWith(codigo + ";").contains(";0;10;;Sin stock;Sí");
+  }
+
+  @Test
+  void stockDeMedicamentosEnExcel() throws Exception {
+    String token = tokenAdmin();
+    String codigo = "XLS-" + sufijo();
+    crearMedicamento(token, codigo, 10);
+
+    MvcResult resultado =
+        consultar("/api/medicamentos/exportar?formato=XLSX&q=" + codigo, token)
+            .andExpect(status().isOk())
+            .andExpect(
+                content()
+                    .contentType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+            .andExpect(
+                header()
+                    .string(
+                        "Content-Disposition", "attachment; filename=\"stock_medicamentos.xlsx\""))
+            .andReturn();
+
+    Map<String, String> partes = descomprimir(resultado.getResponse().getContentAsByteArray());
+    assertThat(partes).containsKeys("xl/workbook.xml", "xl/worksheets/sheet1.xml");
+    String textos =
+        partes.getOrDefault("xl/sharedStrings.xml", "") + partes.get("xl/worksheets/sheet1.xml");
+    // El XML guarda las tildes como entidades: "Pr&#xf3;ximo vencimiento".
+    assertThat(textos).contains("Stock de medicamentos", "Pr&#xf3;ximo vencimiento", codigo);
   }
 
   @Test
@@ -153,6 +189,29 @@ class ReportesIT extends IntegracionBase {
     byte[] bytes = resultado.getResponse().getContentAsByteArray();
     assertThat(bytes).startsWith((byte) 0xEF, (byte) 0xBB, (byte) 0xBF);
     return new String(bytes, StandardCharsets.UTF_8).substring(1);
+  }
+
+  /**
+   * Un .xlsx es un ZIP con XML adentro: devuelve cada archivo con su contenido. Se lee con ZipFile
+   * (por el índice central, como Excel) porque ZipInputStream no acepta el formato de fastexcel.
+   */
+  private static Map<String, String> descomprimir(byte[] xlsx) throws IOException {
+    Path archivo = Files.createTempFile("reporte", ".xlsx");
+    try {
+      Files.write(archivo, xlsx);
+      Map<String, String> partes = new HashMap<>();
+      try (ZipFile zip = new ZipFile(archivo.toFile())) {
+        for (ZipEntry entrada : Collections.list(zip.entries())) {
+          try (InputStream contenido = zip.getInputStream(entrada)) {
+            partes.put(
+                entrada.getName(), new String(contenido.readAllBytes(), StandardCharsets.UTF_8));
+          }
+        }
+      }
+      return partes;
+    } finally {
+      Files.deleteIfExists(archivo);
+    }
   }
 
   private static boolean esPdf(MvcResult resultado) {

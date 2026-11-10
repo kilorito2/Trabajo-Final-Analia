@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 
 public enum FormatoReporte {
   CSV("text/csv;charset=UTF-8", "csv"),
+  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
   PDF("application/pdf", "pdf");
 
   private final MediaType tipo;

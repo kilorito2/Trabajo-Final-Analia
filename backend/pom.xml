@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springdoc.version>3.2.0</springdoc.version>
         <openpdf.version>2.0.3</openpdf.version>
+        <fastexcel.version>0.18.4</fastexcel.version>
         <spotless.version>3.11.0</spotless.version>
         <google-java-format.version>1.35.0</google-java-format.version>
         <jacoco.version>0.8.16</jacoco.version>
@@ -69,6 +70,11 @@
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
             <version>${openpdf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel</artifactId>
+            <version>${fastexcel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

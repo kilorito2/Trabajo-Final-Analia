@@ -63,7 +63,7 @@ public class TransferenciaController {
         pdf, "transferencia_" + Transferencia.numero(id), FormatoReporte.PDF);
   }
 
-  /** Reporte de transferencias en CSV (para Excel) o PDF. */
+  /** Reporte de transferencias en Excel (XLSX), CSV o PDF. */
   @GetMapping("/exportar")
   @PreAuthorize("hasAuthority('LECTURA')")
   public ResponseEntity<byte[]> exportar(

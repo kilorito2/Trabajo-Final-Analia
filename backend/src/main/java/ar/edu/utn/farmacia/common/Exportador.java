@@ -24,6 +24,7 @@ public class Exportador {
   public byte[] generar(Reporte reporte, FormatoReporte formato) {
     return switch (formato) {
       case CSV -> csv(reporte);
+      case XLSX -> ReporteXlsx.generar(reporte, generadoEn());
       case PDF -> ReportePdf.generar(reporte, generadoEn());
     };
   }

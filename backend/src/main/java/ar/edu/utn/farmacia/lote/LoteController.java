@@ -41,7 +41,7 @@ public class LoteController {
     return loteService.listar(medicamentoId, estado, pagina);
   }
 
-  /** Reporte de lotes y vencimientos en CSV (para Excel) o PDF. */
+  /** Reporte de lotes y vencimientos en Excel (XLSX), CSV o PDF. */
   @GetMapping("/api/lotes/exportar")
   @PreAuthorize("hasAuthority('LECTURA')")
   public ResponseEntity<byte[]> exportar(
