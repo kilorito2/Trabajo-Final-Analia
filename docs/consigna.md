@@ -28,17 +28,17 @@ Cada requisito obligatorio, dónde está resuelto y cómo se verifica.
 | Arquitectura con separación de responsabilidades | Backend en capas por funcionalidad: Controller (sin lógica) → Service (`@Transactional`) → Repository → Entidad, con DTO `record`. Frontend: `api/` (único lugar que llama a `fetch`), `hooks/`, `components/` reutilizables y `pages/`. |
 | Código modular y reutilizable | Ejemplos: `Reporte` + `Exportador` generan CSV y PDF para todos los reportes; `Tabla`, `CampoFormulario`, `useFormulario` y `useDescarga` en el front. |
 | Manejo de errores y excepciones | `ManejadorErrores`: todo error sale como ProblemDetail con `codigo`; el 500 tiene `errorId` y no expone el stacktrace. El front muestra los errores debajo de cada campo o como aviso. |
-| Código ordenado y claro | Spotless + google-java-format en `verify`; ESLint, Prettier, TypeScript estricto y knip en el front. 93 tests en el backend y 97 en el front. |
+| Código ordenado y claro | Spotless + google-java-format en `verify`; ESLint, Prettier, TypeScript estricto y knip en el front. 94 tests en el backend y 97 en el front. |
 
 ## Reportes (excluyente)
 
 | Requisito | Dónde |
 |---|---|
 | Mostrar la información en pantalla | Panel con indicadores y alertas, listados de medicamentos, lotes y transferencias con filtros, y la pantalla **Reportes** con "Ver en pantalla". |
-| Exportar a PDF, Excel o CSV | Pantalla **Reportes**: stock de medicamentos, lotes y vencimientos, y transferencias, cada uno en **Excel (CSV)** y **PDF**. El historial de transferencias exporta en los dos formatos y cada comprobante se descarga en PDF con lugar para las firmas. |
+| Exportar a PDF, Excel o CSV | Pantalla **Reportes**: stock de medicamentos, lotes y vencimientos, y transferencias, cada uno en **Excel (.xlsx)** y **PDF** (y CSV por la API). El historial de transferencias exporta en los dos formatos y cada comprobante se descarga en PDF con lugar para las firmas. |
 
 Endpoints: `GET /api/medicamentos/exportar`, `GET /api/lotes/exportar`,
-`GET /api/transferencias/exportar` (todos con `formato=CSV|PDF`) y
+`GET /api/transferencias/exportar` (todos con `formato=CSV|XLSX|PDF`) y
 `GET /api/transferencias/{id}/pdf`. Tests: `ReportesIT`, `FlujoCompletoIT`, `PaginaReportes.test.tsx`.
 
 ## Mejora y presupuesto

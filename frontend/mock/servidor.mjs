@@ -5,6 +5,7 @@
 
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { pdfTabla, xlsx } from './archivos.mjs';
 
 const PUERTO = Number(process.env.PUERTO_MOCK ?? 8080);
 const DIAS_POR_VENCER = 30;
@@ -1115,18 +1116,25 @@ ruta('GET', '/api/transferencias/exportar', 'LECTURA', ({ url }) => {
       ]);
     }
   }
-  return archivoReporte(url, `transferencias_${desde}_${hasta}`, 'Transferencias a áreas', filas, celda);
+  const filtros = [`Desde: ${fechaCorta(desde)}`, `Hasta: ${fechaCorta(hasta)}`];
+  const areaId = url.searchParams.get('areaId');
+  if (areaId) filtros.push(`Área: ${buscar(areas, Number(areaId))?.nombre ?? areaId}`);
+  return archivoReporte(url, `transferencias_${desde}_${hasta}`, 'Transferencias a áreas', filas, {
+    celda,
+    numericas: [8],
+    filtros,
+  });
 });
 
 ruta('GET', '/api/transferencias/{id}/pdf', 'LECTURA', ({ id }) => {
   const t = aTransferencia(exigir(buscar(transferencias, id), id, 'No existe la transferencia {id}.'));
-  const lineas = [
-    `Área: ${t.area.nombre}  ·  Entregó: ${t.realizadaPor.nombreCompleto}`,
-    '',
-    ...t.detalle.map((d) => `${d.medicamento}  ·  Lote ${d.numeroLote}  ·  ${d.cantidad} u.`),
+  const filas = [
+    ['Medicamento', 'Lote', 'Vencimiento', 'Cantidad'],
+    ...t.detalle.map((d) => [d.medicamento, d.numeroLote, fechaCorta(d.fechaVencimiento), d.cantidad]),
   ];
+  const subtitulo = `Área de destino: ${t.area.nombre}  ·  Entregó: ${t.realizadaPor.nombreCompleto}`;
   return {
-    archivo: pdfSimple(`Comprobante de transferencia ${t.numero}`, lineas),
+    archivo: pdfTabla(`Comprobante de transferencia ${t.numero}`, subtitulo, filas, [3]),
     tipo: 'application/pdf',
     nombre: `transferencia_${t.numero}.pdf`,
   };
@@ -1210,55 +1218,35 @@ const celdaCsv = (valor) => {
   return /[;"\n\r]/.test(v) ? `"${v.replaceAll('"', '""')}"` : v;
 };
 
-/** PDF mínimo de una página con texto plano: alcanza para probar la descarga sin el backend. */
-function pdfSimple(titulo, lineas) {
-  const escapar = (t) =>
-    String(t)
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/[^\x20-\x7e]/g, '')
-      .replace(/[\\()]/g, (c) => `\\${c}`);
-  const texto = [`BT /F1 16 Tf 40 800 Td (${escapar(titulo)}) Tj ET`]
-    .concat(lineas.slice(0, 45).map((l, i) => `BT /F1 9 Tf 40 ${770 - i * 15} Td (${escapar(l)}) Tj ET`))
-    .join('\n');
-  const objetos = [
-    '<< /Type /Catalog /Pages 2 0 R >>',
-    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-    `<< /Length ${Buffer.byteLength(texto)} >>\nstream\n${texto}\nendstream`,
-  ];
-  let pdf = '%PDF-1.4\n';
-  const posiciones = objetos.map((objeto, i) => {
-    const posicion = Buffer.byteLength(pdf);
-    pdf += `${i + 1} 0 obj\n${objeto}\nendobj\n`;
-    return posicion;
-  });
-  const xref = Buffer.byteLength(pdf);
-  pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n`;
-  pdf += posiciones.map((p) => `${String(p).padStart(10, '0')} 00000 n \n`).join('');
-  pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
-  return Buffer.from(pdf, 'latin1');
-}
-
-/** filas[0] son los encabezados. */
-function archivoReporte(url, nombreBase, titulo, filas, celda = celdaCsv) {
+/** filas[0] son los encabezados. Mismos formatos que el backend: CSV, XLSX y PDF. */
+function archivoReporte(
+  url,
+  nombreBase,
+  titulo,
+  filas,
+  { celda = celdaCsv, numericas = [], filtros = [] } = {},
+) {
   const formato = url.searchParams.get('formato') ?? 'CSV';
+  const subtitulo = [...filtros, `Generado el ${new Date().toLocaleString('es-AR')}`].join('  ·  ');
   if (formato === 'PDF') {
     return {
-      archivo: pdfSimple(
-        titulo,
-        filas.map((f) => f.join('  |  ')),
-      ),
+      archivo: pdfTabla(titulo, subtitulo, filas, numericas),
       tipo: 'application/pdf',
       nombre: `${nombreBase}.pdf`,
+    };
+  }
+  if (formato === 'XLSX') {
+    return {
+      archivo: xlsx(titulo, subtitulo, filas, numericas),
+      tipo: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      nombre: `${nombreBase}.xlsx`,
     };
   }
   if (formato !== 'CSV') {
     throw new Problema(400, 'PARAMETRO_INVALIDO', "El parámetro 'formato' tiene un valor inválido.");
   }
   return {
-    archivo: `﻿${filas.map((f) => f.map(celda).join(';')).join('\r\n')}\r\n`,
+    archivo: `\ufeff${filas.map((f) => f.map(celda).join(';')).join('\r\n')}\r\n`,
     tipo: 'text/csv; charset=UTF-8',
     nombre: `${nombreBase}.csv`,
   };
@@ -1305,7 +1293,14 @@ ruta('GET', '/api/medicamentos/exportar', 'LECTURA', ({ url }) => {
       m.activo ? 'Sí' : 'No',
     ]),
   ];
-  return archivoReporte(url, 'stock_medicamentos', 'Stock de medicamentos', filas);
+  const filtros = [];
+  if (q) filtros.push(`Búsqueda: ${q}`);
+  if (estado) filtros.push(`Estado: ${TEXTO_ESTADO_STOCK[estado]}`);
+  filtros.push(activo === null ? 'Incluye inactivos' : 'Solo activos');
+  return archivoReporte(url, 'stock_medicamentos', 'Stock de medicamentos', filas, {
+    numericas: [3, 4],
+    filtros,
+  });
 });
 
 ruta('GET', '/api/lotes/exportar', 'LECTURA', ({ url }) => {
@@ -1340,7 +1335,13 @@ ruta('GET', '/api/lotes/exportar', 'LECTURA', ({ url }) => {
       TEXTO_ESTADO_LOTE[l.estado],
     ]),
   ];
-  return archivoReporte(url, 'lotes_vencimientos', 'Lotes y vencimientos', filas);
+  const filtros = [
+    `Estado: ${estados.length ? estados.map((e) => TEXTO_ESTADO_LOTE[e]).join(', ') : 'todos'}`,
+  ];
+  return archivoReporte(url, 'lotes_vencimientos', 'Lotes y vencimientos', filas, {
+    numericas: [4, 5, 6],
+    filtros,
+  });
 });
 
 // ---------- Servidor ----------

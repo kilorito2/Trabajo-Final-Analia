@@ -51,7 +51,7 @@ del backend a criterios de aceptación verificables por endpoint. No agrega requ
 | Endpoint | Criterios de aceptación |
 |---|---|
 | `GET /api/medicamentos` (`LECTURA`) | Filtros `q` (código o nombre), `estado` (`SIN_STOCK`, `STOCK_BAJO`, `OK`), `activo`. Orden: `codigo`, `nombre`, `stockTotal`, `proximoVencimiento`. `stockTotal` suma solo lotes no vencidos. `proximoVencimiento` es null sin lotes con stock. |
-| `GET /api/medicamentos/exportar` (`LECTURA`) | Mismos filtros que el listado (`q`, `estado`, `activo`), sin paginar, ordenado por nombre. `formato=CSV` (por defecto) o `PDF`; otro valor: 400 `PARAMETRO_INVALIDO`. Archivo `stock_medicamentos.csv` / `.pdf`. |
+| `GET /api/medicamentos/exportar` (`LECTURA`) | Mismos filtros que el listado (`q`, `estado`, `activo`), sin paginar, ordenado por nombre. `formato=CSV` (por defecto), `XLSX` o `PDF`; otro valor: 400 `PARAMETRO_INVALIDO`. Archivo `stock_medicamentos.csv` / `.xlsx` / `.pdf`. |
 | `GET /api/medicamentos/{id}` | Igual que el listado más `lotes` con stock en orden FEFO. 404 si no existe. |
 | `POST`/`PUT /api/medicamentos` (`CATALOGO_EDITAR`) | `stockMinimo >= 0`. Código repetido: 409 `CODIGO_DUPLICADO`. |
 | `PATCH /api/medicamentos/{id}/estado` | 204. Con stock no vencido: 409 `MEDICAMENTO_CON_STOCK`. |
@@ -62,7 +62,7 @@ del backend a criterios de aceptación verificables por endpoint. No agrega requ
 |---|---|
 | `POST /api/medicamentos/{id}/lotes` (`STOCK_INGRESAR`) | Medicamento y proveedor activos (409 `MEDICAMENTO_INACTIVO` / `PROVEEDOR_INACTIVO`). `fechaVencimiento >= hoy` (400 `VALIDACION` con `errors.fechaVencimiento`). `cantidad > 0`. Número de lote repetido para ese medicamento: 409 `LOTE_DUPLICADO`. Genera un movimiento `INGRESO`. 201 con `{lote, stockTotalResultante}`. |
 | `GET /api/lotes` (`LECTURA`) | Filtros `medicamentoId` y `estado` (uno o varios: `VIGENTE`, `POR_VENCER`, `VENCIDO`, `AGOTADO`). Orden: `fechaVencimiento`, `fechaIngreso`. |
-| `GET /api/lotes/exportar` (`LECTURA`) | Filtros `medicamentoId` y `estado` del listado, sin paginar, ordenado por vencimiento. `formato=CSV` o `PDF`. Archivo `lotes_vencimientos.csv` / `.pdf`. |
+| `GET /api/lotes/exportar` (`LECTURA`) | Filtros `medicamentoId` y `estado` del listado, sin paginar, ordenado por vencimiento. `formato=CSV`, `XLSX` o `PDF`. Archivo `lotes_vencimientos.csv` / `.xlsx` / `.pdf`. |
 | `POST /api/lotes/{id}/baja` (`STOCK_BAJA_AJUSTE`) | Solo lotes vencidos con stock: si no venció, 409 `LOTE_NO_VENCIDO`; si está en 0, 409 `LOTE_SIN_STOCK`. Deja el lote en 0 y registra `BAJA_VENCIMIENTO` con el motivo (5 a 200 caracteres). |
 | `POST /api/lotes/{id}/ajuste` (`STOCK_BAJA_AJUSTE`) | `0 <= cantidadNueva <= cantidadInicial` y distinta de la actual (400 `VALIDACION`). Motivo de 5 a 200 caracteres. Registra `AJUSTE` con la diferencia. Usa bloqueo pesimista. |
 | `GET /api/movimientos` (`LECTURA`) | Filtros `loteId`, `medicamentoId`, `tipo`, `desde`, `hasta`. Orden: `fechaHora` (desc por defecto). La suma de `cantidad` de un lote es igual a su `cantidadActual`. |
@@ -75,7 +75,7 @@ del backend a criterios de aceptación verificables por endpoint. No agrega requ
 | `GET /api/transferencias` (`LECTURA`) | Filtros `desde`, `hasta` (inclusive), `areaId`. Orden: `fechaHora` (desc por defecto). Cada fila trae `numero` (`TR-000123`), `cantidadItems` y `unidadesTotales`. |
 | `GET /api/transferencias/{id}` | Comprobante completo o 404. |
 | `GET /api/transferencias/{id}/pdf` | Comprobante en PDF con lugar para las firmas, o 404. |
-| `GET /api/transferencias/exportar` | `desde` y `hasta` obligatorios, hasta 366 días (400 `PARAMETRO_INVALIDO`). `formato=CSV` (por defecto) o `PDF`. En CSV: `text/csv`, BOM UTF-8, separador `;`, fin de línea `\r\n`, fechas `dd/mm/aaaa HH:mm`. Una fila por línea de detalle. Valores que empiezan con `=`, `+`, `-`, `@`, tabulación o retorno de carro llevan `'` adelante. |
+| `GET /api/transferencias/exportar` | `desde` y `hasta` obligatorios, hasta 366 días (400 `PARAMETRO_INVALIDO`). `formato=CSV` (por defecto), `XLSX` o `PDF`. En CSV: `text/csv`, BOM UTF-8, separador `;`, fin de línea `\r\n`, fechas `dd/mm/aaaa HH:mm`. Una fila por línea de detalle. Valores que empiezan con `=`, `+`, `-`, `@`, tabulación o retorno de carro llevan `'` adelante. |
 
 ## Alertas y resumen (`LECTURA`)
 

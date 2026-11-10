@@ -1376,7 +1376,7 @@ export interface components {
         /** @enum {string} */
         TipoMovimiento: "INGRESO" | "EGRESO" | "BAJA_VENCIMIENTO" | "AJUSTE";
         /** @enum {string} */
-        FormatoReporte: "CSV" | "PDF";
+        FormatoReporte: "CSV" | "XLSX" | "PDF";
         SolicitudRecuperacionRequest: {
             username: string;
         };
@@ -1689,13 +1689,14 @@ export interface components {
         };
     };
     responses: {
-        /** @description CSV (para Excel) o PDF */
+        /** @description Excel (XLSX), CSV o PDF */
         Archivo: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
                 "text/csv": string;
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 "application/pdf": string;
             };
         };

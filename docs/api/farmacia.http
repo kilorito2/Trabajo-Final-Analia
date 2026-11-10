@@ -175,6 +175,10 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/api/medicamentos/exportar?estado=STOCK_BAJO&formato=PDF
 Authorization: Bearer {{token}}
 
+### Reporte de stock en Excel (.xlsx)
+GET {{baseUrl}}/api/medicamentos/exportar?formato=XLSX
+Authorization: Bearer {{token}}
+
 ### Reporte de lotes vencidos y por vencer (CSV)
 GET {{baseUrl}}/api/lotes/exportar?estado=VENCIDO&estado=POR_VENCER&formato=CSV
 Authorization: Bearer {{token}}

@@ -85,12 +85,12 @@ export function PaginaTransferencias() {
             <button
               type="button"
               className="boton"
-              onClick={() => exportar('CSV')}
+              onClick={() => exportar('XLSX')}
               disabled={Boolean(problemaExportacion) || descarga.enCurso !== null}
               aria-describedby={problemaExportacion ? 'problema-exportacion' : undefined}
             >
               <Download size={16} aria-hidden="true" />
-              {descarga.enCurso === 'CSV' ? 'Exportando…' : 'Exportar a Excel'}
+              {descarga.enCurso === 'XLSX' ? 'Exportando…' : 'Exportar a Excel'}
             </button>
             <button
               type="button"

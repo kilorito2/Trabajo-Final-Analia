@@ -88,3 +88,9 @@ decidió y por qué.
     (libre, LGPL/MPL) con la identidad del sistema; el CSV mantiene el formato que ya usaba Excel.
     `formato` es un parámetro del mismo endpoint de cada listado (`/exportar`), con los mismos
     filtros, y por defecto es CSV para no romper a los clientes existentes.
+15. **Excel de verdad (.xlsx) además del CSV.** Un CSV no guarda anchos de columna: Excel lo abría
+    con las columnas angostas y la fecha con hora como `##########`. `ReporteXlsx` (con fastexcel,
+    liviana y Apache 2.0) arma la planilla con título, filtros, encabezado con color fijo al
+    desplazarse, filtros de columna, anchos según el contenido, cantidades como números y fechas
+    como fechas, así se pueden ordenar y sumar. El botón "Excel" del front baja el .xlsx; el CSV
+    sigue disponible en la API.

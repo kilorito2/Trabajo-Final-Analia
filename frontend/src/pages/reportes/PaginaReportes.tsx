@@ -86,10 +86,10 @@ function TarjetaReporte({
             className="boton"
             disabled={deshabilitado}
             aria-describedby={problema ? idProblema : undefined}
-            onClick={() => alExportar('CSV')}
+            onClick={() => alExportar('XLSX')}
           >
             <FileSpreadsheet size={16} aria-hidden="true" />
-            {enCurso === 'CSV' ? 'Descargando…' : 'Excel (CSV)'}
+            {enCurso === 'XLSX' ? 'Descargando…' : 'Excel'}
           </button>
           <button
             type="button"
@@ -288,8 +288,8 @@ export function PaginaReportes() {
     <>
       <EncabezadoPagina titulo="Reportes" />
       <p className="texto-suave reportes__intro">
-        Elegí los filtros y descargá el reporte en Excel (CSV) o PDF. Siempre incluye todo lo filtrado, no
-        solo lo que se ve en una página.
+        Elegí los filtros y descargá el reporte en Excel o PDF. Siempre incluye todo lo filtrado, no solo lo
+        que se ve en una página.
       </p>
       <div className="reportes">
         <ReporteStock />

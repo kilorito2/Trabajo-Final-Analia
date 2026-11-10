@@ -1,10 +1,11 @@
-import { descargar, type Parametros } from './cliente';
+import { descargar, type Parametros, type TipoArchivo } from './cliente';
 import type { EstadoLote, EstadoStock, FormatoReporte } from './tipos';
 
 // Los reportes los arma el backend con todo lo filtrado, no solo la página visible.
 
-const TIPO: Record<FormatoReporte, 'text/csv' | 'application/pdf'> = {
+const TIPO: Record<FormatoReporte, TipoArchivo> = {
   CSV: 'text/csv',
+  XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   PDF: 'application/pdf',
 };
 

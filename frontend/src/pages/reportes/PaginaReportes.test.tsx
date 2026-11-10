@@ -89,6 +89,6 @@ describe('Reportes', () => {
       within(tarjeta).getByText('La fecha "desde" no puede ser posterior a "hasta".'),
     ).toBeInTheDocument();
     expect(within(tarjeta).getByRole('button', { name: 'PDF' })).toBeDisabled();
-    expect(within(tarjeta).getByRole('button', { name: 'Excel (CSV)' })).toBeDisabled();
+    expect(within(tarjeta).getByRole('button', { name: 'Excel' })).toBeDisabled();
   });
 });

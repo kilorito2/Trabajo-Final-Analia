@@ -258,9 +258,10 @@ components:
     formato: { name: formato, in: query, schema: { $ref: '#/components/schemas/FormatoReporte' } }
   responses:
     Archivo:
-      description: CSV (para Excel) o PDF
+      description: Excel (XLSX), CSV o PDF
       content:
         text/csv: { schema: { type: string } }
+        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: { schema: { type: string, format: binary } }
         application/pdf: { schema: { type: string, format: binary } }
   schemas:
     Rol: { type: string, enum: [ADMIN, FARMACEUTICO, CONSULTA] }
@@ -268,7 +269,7 @@ components:
     EstadoStock: { type: string, enum: [SIN_STOCK, STOCK_BAJO, OK] }
     EstadoLote: { type: string, enum: [VIGENTE, POR_VENCER, VENCIDO, AGOTADO] }
     TipoMovimiento: { type: string, enum: [INGRESO, EGRESO, BAJA_VENCIMIENTO, AJUSTE] }
-    FormatoReporte: { type: string, enum: [CSV, PDF] }
+    FormatoReporte: { type: string, enum: [CSV, XLSX, PDF] }
     SolicitudRecuperacionRequest:
       type: object
       required: [username]
