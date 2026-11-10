@@ -2,7 +2,9 @@ package ar.edu.utn.farmacia.lote;
 
 import ar.edu.utn.farmacia.auth.UsuarioActual;
 import ar.edu.utn.farmacia.common.ErrorDeCampoException;
+import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.FarmaciaProperties;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import ar.edu.utn.farmacia.common.Ordenamiento;
 import ar.edu.utn.farmacia.common.RecursoNoEncontradoException;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,7 @@ public class LoteService {
   private final ProveedorRepository proveedorRepository;
   private final UsuarioActual usuarioActual;
   private final FarmaciaProperties propiedades;
+  private final Exportador exportador;
   private final Clock clock;
 
   @Transactional
@@ -95,6 +99,27 @@ public class LoteService {
   public Page<LoteResponse> listar(Long medicamentoId, Set<EstadoLote> estados, Pageable pagina) {
     Ordenamiento.validar(pagina.getSort(), ORDEN_PERMITIDO);
     LocalDate hoy = LocalDate.now(clock);
+    return loteRepository
+        .findAll(filtro(medicamentoId, estados, hoy), pagina)
+        .map(lote -> respuesta(lote, hoy));
+  }
+
+  /** Reporte de lotes con los mismos filtros que el listado, ordenado por vencimiento. */
+  @Transactional(readOnly = true)
+  public byte[] exportar(Long medicamentoId, Set<EstadoLote> estados, FormatoReporte formato) {
+    LocalDate hoy = LocalDate.now(clock);
+    List<LoteResponse> lotes =
+        loteRepository
+            .findAll(
+                filtro(medicamentoId, estados, hoy),
+                Sort.by("fechaVencimiento", "fechaIngreso", "id"))
+            .stream()
+            .map(lote -> respuesta(lote, hoy))
+            .toList();
+    return exportador.generar(LoteReporte.generar(lotes, estados), formato);
+  }
+
+  private Specification<Lote> filtro(Long medicamentoId, Set<EstadoLote> estados, LocalDate hoy) {
     LocalDate limite = hoy.plusDays(propiedades.alertas().diasPorVencer());
     List<Specification<Lote>> filtros = new ArrayList<>();
     if (medicamentoId != null) {
@@ -109,9 +134,7 @@ public class LoteService {
                       .map(estado -> condicionDeEstado(estado, raiz, cb, hoy, limite))
                       .toArray(Predicate[]::new)));
     }
-    return loteRepository
-        .findAll(Specification.allOf(filtros), pagina)
-        .map(lote -> respuesta(lote, hoy));
+    return Specification.allOf(filtros);
   }
 
   @Transactional

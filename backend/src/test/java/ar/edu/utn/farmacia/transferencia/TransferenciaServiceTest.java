@@ -19,6 +19,7 @@ import ar.edu.utn.farmacia.area.Area;
 import ar.edu.utn.farmacia.area.AreaRepository;
 import ar.edu.utn.farmacia.auth.UsuarioActual;
 import ar.edu.utn.farmacia.common.ErrorDeCampoException;
+import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
 import ar.edu.utn.farmacia.lote.Lote;
 import ar.edu.utn.farmacia.lote.LoteRepository;
@@ -69,6 +70,7 @@ class TransferenciaServiceTest {
             loteRepository,
             movimientoRepository,
             new UsuarioActual(usuarioRepository),
+            new Exportador(RelojFijoConfig.reloj()),
             RelojFijoConfig.reloj());
     SecurityContextHolder.getContext()
         .setAuthentication(new TestingAuthenticationToken(USUARIO_ID.toString(), null));

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 /** Consultas con el stock calculado en la base, sin cargar los lotes en memoria. */
 public interface MedicamentoConsultas {
@@ -12,4 +13,7 @@ public interface MedicamentoConsultas {
       FiltroMedicamentos filtro, LocalDate hoy, Pageable pagina);
 
   List<MedicamentoConStock> activosConStock(LocalDate hoy);
+
+  /** Todos los que cumplen el filtro, sin paginar, para los reportes. */
+  List<MedicamentoConStock> todosConStock(FiltroMedicamentos filtro, LocalDate hoy, Sort orden);
 }
