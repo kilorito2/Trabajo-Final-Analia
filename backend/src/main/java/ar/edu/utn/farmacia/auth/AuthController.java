@@ -16,10 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final AuthService authService;
+  private final RecuperacionService recuperacionService;
 
   @PostMapping("/login")
   public LoginResponse login(@Valid @RequestBody LoginRequest pedido) {
     return authService.login(pedido);
+  }
+
+  @PostMapping("/recuperacion")
+  public ResponseEntity<SolicitudRecuperacionResponse> solicitarRecuperacion(
+      @Valid @RequestBody SolicitudRecuperacionRequest pedido) {
+    return ResponseEntity.accepted().body(recuperacionService.solicitar(pedido));
+  }
+
+  @PostMapping("/recuperacion/confirmar")
+  public ResponseEntity<Void> confirmarRecuperacion(
+      @Valid @RequestBody ConfirmacionRecuperacionRequest pedido) {
+    recuperacionService.confirmar(pedido);
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/me")

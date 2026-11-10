@@ -47,3 +47,6 @@ farmacia:
     origenes: ${CORS_ORIGENES:}
   admin:
     password: ${ADMIN_PASSWORD:}
+  recuperacion:
+    vigencia: 15m
+    intentos-maximos: 5
