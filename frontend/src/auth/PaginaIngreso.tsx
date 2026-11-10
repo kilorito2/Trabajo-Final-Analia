@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { BellRing, ClipboardCheck, ShieldCheck } from 'lucide-react';
 import { iniciarSesion } from '../api/auth';
 import { MENSAJES, mensajeDeError } from '../api/errores';
+import { Logo, Marca } from '../components/Logo';
 import { useSesion } from './SesionProvider';
 
 function destinoGuardado(estado: unknown): string {
@@ -53,48 +55,72 @@ export function PaginaIngreso() {
   return (
     <main className="ingreso">
       <title>Ingresar · Farmacia</title>
-      <form className="ingreso__tarjeta tarjeta" onSubmit={enviar} noValidate>
-        <div>
-          <h1>Farmacia</h1>
-          <p className="texto-suave">Control de stock del hospital</p>
+      <section className="ingreso__presentacion" aria-label="Presentación">
+        <Marca subtitulo="Hospital público" />
+        <div className="ingreso__mensaje">
+          <p className="ingreso__titular">Control de stock de la farmacia del hospital</p>
+          <p>Medicamentos, lotes y vencimientos en un solo lugar, con trazabilidad de cada unidad.</p>
         </div>
-        {error && (
-          <p className="mensaje mensaje--peligro" role="alert">
-            {error}
-          </p>
-        )}
-        <div className="campo">
-          <label className="campo__etiqueta" htmlFor="usuario">
-            Usuario
-          </label>
-          <input
-            id="usuario"
-            className="control"
-            autoComplete="username"
-            // El foco inicial va al usuario: es lo único que se hace en esta pantalla.
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className="campo">
-          <label className="campo__etiqueta" htmlFor="password">
-            Contraseña
-          </label>
-          <input
-            id="password"
-            className="control"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="boton boton--primario ingreso__boton" disabled={enviando}>
-          {enviando ? 'Ingresando…' : 'Ingresar'}
-        </button>
-      </form>
+        <ul className="ingreso__puntos">
+          <li>
+            <ClipboardCheck size={20} aria-hidden="true" />
+            Transferencias a las áreas por orden de vencimiento
+          </li>
+          <li>
+            <BellRing size={20} aria-hidden="true" />
+            Alertas de lotes por vencer y de stock bajo
+          </li>
+          <li>
+            <ShieldCheck size={20} aria-hidden="true" />
+            Acceso por roles y registro de cada movimiento
+          </li>
+        </ul>
+      </section>
+      <div className="ingreso__lado-formulario">
+        <form className="ingreso__tarjeta" onSubmit={enviar} noValidate>
+          <div className="ingreso__encabezado">
+            <Logo tamano={40} />
+            <h1>Ingresar</h1>
+            <p className="texto-suave">Usá el usuario que te dio el administrador.</p>
+          </div>
+          {error && (
+            <p className="mensaje mensaje--peligro" role="alert">
+              {error}
+            </p>
+          )}
+          <div className="campo">
+            <label className="campo__etiqueta" htmlFor="usuario">
+              Usuario
+            </label>
+            <input
+              id="usuario"
+              className="control"
+              autoComplete="username"
+              // El foco inicial va al usuario: es lo único que se hace en esta pantalla.
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="campo">
+            <label className="campo__etiqueta" htmlFor="password">
+              Contraseña
+            </label>
+            <input
+              id="password"
+              className="control"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="boton boton--primario ingreso__boton" disabled={enviando}>
+            {enviando ? 'Ingresando…' : 'Ingresar'}
+          </button>
+        </form>
+      </div>
     </main>
   );
 }

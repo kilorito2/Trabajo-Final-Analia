@@ -30,6 +30,11 @@
   .tarjeta {
     border: 0;
     overflow: visible;
+    box-shadow: none;
+  }
+
+  .tabla th {
+    background: none;
   }
 
   .comprobante {

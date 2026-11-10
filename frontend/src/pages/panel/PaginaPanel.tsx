@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react';
 import { Link } from 'react-router';
+import { CalendarClock, OctagonAlert, PackageX, TrendingDown, type LucideIcon } from 'lucide-react';
 import { useAlertas, useResumen } from '../../api/alertas';
 import type { AlertaLote, AlertaMedicamento, Resumen } from '../../api/tipos';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
@@ -11,19 +12,44 @@ import { formatearNumero } from '../../utils/numeros';
 
 const MAXIMO_POR_GRUPO = 10;
 
-type Indicador = { clave: keyof Resumen['totales']; etiqueta: string; tono: Tono; enlace: string };
+type Indicador = {
+  clave: keyof Resumen['totales'];
+  etiqueta: string;
+  tono: Tono;
+  enlace: string;
+  icono: LucideIcon;
+};
 
 function indicadores(diasPorVencer: number): Indicador[] {
   return [
-    { clave: 'vencidos', etiqueta: 'Vencidos', tono: 'peligro', enlace: '/lotes?estado=VENCIDO' },
-    { clave: 'sinStock', etiqueta: 'Sin stock', tono: 'peligro', enlace: '/medicamentos?estado=SIN_STOCK' },
+    {
+      clave: 'vencidos',
+      etiqueta: 'Lotes vencidos',
+      tono: 'peligro',
+      enlace: '/lotes?estado=VENCIDO',
+      icono: OctagonAlert,
+    },
+    {
+      clave: 'sinStock',
+      etiqueta: 'Sin stock',
+      tono: 'peligro',
+      enlace: '/medicamentos?estado=SIN_STOCK',
+      icono: PackageX,
+    },
     {
       clave: 'porVencer',
       etiqueta: `Por vencer (${diasPorVencer} días)`,
       tono: 'aviso',
       enlace: '/lotes?estado=POR_VENCER',
+      icono: CalendarClock,
     },
-    { clave: 'stockBajo', etiqueta: 'Stock bajo', tono: 'aviso', enlace: '/medicamentos?estado=STOCK_BAJO' },
+    {
+      clave: 'stockBajo',
+      etiqueta: 'Stock bajo',
+      tono: 'aviso',
+      enlace: '/medicamentos?estado=STOCK_BAJO',
+      icono: TrendingDown,
+    },
   ];
 }
 
@@ -103,6 +129,9 @@ export function PaginaPanel() {
             {indicadores(resumen.data.diasPorVencer).map((indicador) => (
               <li key={indicador.clave}>
                 <Link to={indicador.enlace} className={`indicador indicador--${indicador.tono}`}>
+                  <span className="indicador__icono">
+                    <indicador.icono size={20} aria-hidden="true" />
+                  </span>
                   <span className="indicador__numero">
                     {formatearNumero(resumen.data.totales[indicador.clave])}
                   </span>

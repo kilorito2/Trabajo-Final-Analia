@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router';
 import { Menu as IconoMenu } from 'lucide-react';
+import { Marca } from './Logo';
 import { Menu } from './Menu';
 
 const ID_MENU = 'menu-principal';
@@ -14,7 +15,7 @@ export function Layout() {
         Saltar al contenido
       </a>
       <div className="barra-superior">
-        <span className="menu__marca">Farmacia</span>
+        <Marca />
         <button
           type="button"
           className="boton"
