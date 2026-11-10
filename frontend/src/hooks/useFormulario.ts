@@ -1,4 +1,4 @@
-import { useCallback, useState, type ChangeEvent } from 'react';
+import { useCallback, useState, type ChangeEvent, type FocusEvent } from 'react';
 import { ErrorApi, mensajeDeError } from '../api/errores';
 
 type Valores = Record<string, string | boolean>;
@@ -82,7 +82,13 @@ export function useFormulario<V extends Valores>(inicial: V, validaciones: Valid
     value: String(valores[campo]),
     onChange: (evento: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       cambiar(campo, evento.target.value as V[typeof campo]),
-    onBlur: () => alSalir(campo),
+    onBlur: (evento: FocusEvent) => {
+      // Si el foco va al botón de enviar, el envío valida todo. Validar acá podría borrar un
+      // mensaje, subir el botón mientras se aprieta y hacer que el clic caiga afuera.
+      const destino = evento.relatedTarget;
+      if (destino instanceof HTMLButtonElement && destino.type === 'submit') return;
+      alSalir(campo);
+    },
   });
 
   return {

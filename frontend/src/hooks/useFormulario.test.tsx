@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { useFormulario } from './useFormulario';
@@ -51,6 +51,20 @@ describe('useFormulario y CampoFormulario', () => {
     expect(codigo).toHaveAttribute('aria-invalid', 'true');
     await usuario.tab();
     expect(codigo).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  it('si el foco pasa al botón de enviar, no valida al salir: lo hace el envío', async () => {
+    const usuario = userEvent.setup();
+    render(<Formulario alEnviar={vi.fn()} />);
+    const codigo = screen.getByRole('textbox', { name: /Código/ });
+    await usuario.click(codigo);
+    await usuario.tab();
+    await usuario.type(codigo, 'A');
+
+    fireEvent.blur(codigo, { relatedTarget: screen.getByRole('button', { name: 'Guardar' }) });
+
+    // El mensaje sigue en su lugar hasta el envío: así el botón no se mueve mientras se aprieta.
+    expect(codigo).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('indica los obligatorios con texto', () => {

@@ -20,6 +20,7 @@ type ValorSesion = {
 type MotivoSalida = 'expirada' | 'salida' | null;
 
 const AVISO_ANTES_MS = 5 * 60 * 1000;
+const ESPERA_MAXIMA_MS = 2 ** 31 - 1;
 
 const Contexto = createContext<ValorSesion | null>(null);
 
@@ -74,6 +75,8 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     if (!expiraEn) return;
     let idAviso: number | null = null;
     const espera = Math.max(0, Date.parse(expiraEn) - AVISO_ANTES_MS - Date.now());
+    // setTimeout dispara al instante si la espera supera ~24,8 días (2^31 - 1 ms).
+    if (espera > ESPERA_MAXIMA_MS) return;
     const temporizador = setTimeout(() => {
       idAviso = avisar(
         'advertencia',
