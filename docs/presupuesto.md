@@ -1,9 +1,16 @@
 # Mejora propuesta y presupuesto
 
-> **Pendiente:** falta definir el valor hora. Los costos están expresados como
-> `horas × valor hora`; cuando se defina, se completan los montos de las tablas.
+**Valor hora: $25.000** (pesos argentinos, noviembre de 2026).
 
-**Valor hora de referencia:** _a definir_ (desarrollador semi senior, freelance, en pesos argentinos).
+Cómo se calculó:
+
+1. Sueldo de referencia: mediana de un desarrollador semi senior que cobra en pesos, $2.500.000
+   por mes (encuesta de sueldos de Sysarmy 2026.1).
+2. Valor por hora como empleado: $2.500.000 / 160 horas mensuales ≈ $15.600.
+3. Ajuste por trabajo independiente (× 1,6): un freelance no cobra aguinaldo ni vacaciones, paga
+   monotributo y su equipo, y tiene meses sin trabajo. $15.600 × 1,6 ≈ **$25.000 por hora**.
+
+Por la inflación, el valor se debe actualizar si el presupuesto se presenta más adelante.
 
 ## 1. Sistema original
 
@@ -30,7 +37,7 @@ base de datos, reportes, tests y documentación).
 | Gestión del proyecto y pruebas de aceptación | 24 |
 | **Total** | **444** |
 
-**Costo del sistema original:** 444 h × valor hora.
+**Costo del sistema original:** 444 h × $25.000 = **$11.100.000**.
 
 ## 2. Mejora propuesta: órdenes de compra y reposición automática
 
@@ -85,15 +92,15 @@ Un módulo de **órdenes de compra** integrado con el stock:
 | Contingencia (10 %) por integración con el correo del hospital | 12 |
 | **Total de la mejora** | **128** |
 
-**Costo de la mejora:** 128 h × valor hora.
+**Costo de la mejora:** 128 h × $25.000 = **$3.200.000**.
 
 ## 3. Presupuesto total
 
-| Concepto | Horas | Costo |
+| Concepto | Horas | Costo (a $25.000/h) |
 |---|---:|---:|
-| Sistema original | 444 | 444 × valor hora |
-| Mejora: órdenes de compra y reposición | 128 | 128 × valor hora |
-| **Total** | **572** | **572 × valor hora** |
+| Sistema original | 444 | $11.100.000 |
+| Mejora: órdenes de compra y reposición | 128 | $3.200.000 |
+| **Total** | **572** | **$14.300.000** |
 
 ### Condiciones
 
