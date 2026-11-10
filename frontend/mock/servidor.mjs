@@ -655,6 +655,45 @@ ruta('POST', '/api/auth/login', null, ({ cuerpo }) => {
   return { status: 200, cuerpo: { token, expiraEn, usuario: aSesion(usuario) } };
 });
 
+// Recuperación de contraseña simulada: la respuesta trae el código, como el perfil demo del backend.
+const recuperaciones = new Map();
+const MENSAJE_RECUPERACION =
+  'Si el usuario existe y está activo, le enviamos un código para crear una contraseña nueva.';
+
+ruta('POST', '/api/auth/recuperacion', null, ({ cuerpo }) => {
+  validar([['username', texto(cuerpo.username).trim() ? null : 'Ingresá tu usuario.']]);
+  const usuario = usuarios.find((u) => u.username === texto(cuerpo.username).trim().toLowerCase());
+  if (!usuario?.activo)
+    return { status: 202, cuerpo: { mensaje: MENSAJE_RECUPERACION, codigoSimulado: null } };
+  const codigo = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
+  recuperaciones.set(usuario.id, { codigo, intentos: 0, venceEn: Date.now() + 15 * 60_000 });
+  return { status: 202, cuerpo: { mensaje: MENSAJE_RECUPERACION, codigoSimulado: codigo } };
+});
+
+ruta('POST', '/api/auth/recuperacion/confirmar', null, ({ cuerpo }) => {
+  validar([
+    ['username', texto(cuerpo.username).trim() ? null : 'Ingresá tu usuario.'],
+    ['codigo', /^\d{6}$/.test(texto(cuerpo.codigo)) ? null : 'El código tiene 6 números.'],
+    [
+      'passwordNueva',
+      texto(cuerpo.passwordNueva).length < 8 ? 'La contraseña debe tener entre 8 y 72 caracteres.' : null,
+    ],
+  ]);
+  const invalido = 'El código no es válido o ya venció. Pedí uno nuevo.';
+  const usuario = usuarios.find((u) => u.username === texto(cuerpo.username).trim().toLowerCase());
+  const pedido = usuario?.activo ? recuperaciones.get(usuario.id) : undefined;
+  if (!pedido || pedido.venceEn < Date.now()) throw validacion({ codigo: invalido });
+  pedido.intentos += 1;
+  if (pedido.intentos > 5) {
+    recuperaciones.delete(usuario.id);
+    throw validacion({ codigo: 'Superaste la cantidad de intentos. Pedí un código nuevo.' });
+  }
+  if (pedido.codigo !== cuerpo.codigo) throw validacion({ codigo: invalido });
+  usuario.password = cuerpo.passwordNueva;
+  recuperaciones.delete(usuario.id);
+  return { status: 204 };
+});
+
 ruta('GET', '/api/auth/me', 'AUTENTICADO', ({ usuario }) => ({ cuerpo: aSesion(usuario) }));
 
 ruta('PATCH', '/api/auth/me/password', 'AUTENTICADO', ({ usuario, cuerpo }) => {
@@ -1076,9 +1115,20 @@ ruta('GET', '/api/transferencias/exportar', 'LECTURA', ({ url }) => {
       ]);
     }
   }
+  return archivoReporte(url, `transferencias_${desde}_${hasta}`, 'Transferencias a áreas', filas, celda);
+});
+
+ruta('GET', '/api/transferencias/{id}/pdf', 'LECTURA', ({ id }) => {
+  const t = aTransferencia(exigir(buscar(transferencias, id), id, 'No existe la transferencia {id}.'));
+  const lineas = [
+    `Área: ${t.area.nombre}  ·  Entregó: ${t.realizadaPor.nombreCompleto}`,
+    '',
+    ...t.detalle.map((d) => `${d.medicamento}  ·  Lote ${d.numeroLote}  ·  ${d.cantidad} u.`),
+  ];
   return {
-    csv: `﻿${filas.map((f) => f.map(celda).join(';')).join('\r\n')}\r\n`,
-    nombre: `transferencias_${desde}_${hasta}.csv`,
+    archivo: pdfSimple(`Comprobante de transferencia ${t.numero}`, lineas),
+    tipo: 'application/pdf',
+    nombre: `transferencia_${t.numero}.pdf`,
   };
 });
 
@@ -1152,6 +1202,147 @@ ruta('GET', '/api/resumen', 'LECTURA', () => {
   };
 });
 
+// ---------- Reportes ----------
+
+const celdaCsv = (valor) => {
+  let v = String(valor ?? '');
+  if (/^[=+\-@\t\r]/.test(v)) v = `'${v}`;
+  return /[;"\n\r]/.test(v) ? `"${v.replaceAll('"', '""')}"` : v;
+};
+
+/** PDF mínimo de una página con texto plano: alcanza para probar la descarga sin el backend. */
+function pdfSimple(titulo, lineas) {
+  const escapar = (t) =>
+    String(t)
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^\x20-\x7e]/g, '')
+      .replace(/[\\()]/g, (c) => `\\${c}`);
+  const texto = [`BT /F1 16 Tf 40 800 Td (${escapar(titulo)}) Tj ET`]
+    .concat(lineas.slice(0, 45).map((l, i) => `BT /F1 9 Tf 40 ${770 - i * 15} Td (${escapar(l)}) Tj ET`))
+    .join('\n');
+  const objetos = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    `<< /Length ${Buffer.byteLength(texto)} >>\nstream\n${texto}\nendstream`,
+  ];
+  let pdf = '%PDF-1.4\n';
+  const posiciones = objetos.map((objeto, i) => {
+    const posicion = Buffer.byteLength(pdf);
+    pdf += `${i + 1} 0 obj\n${objeto}\nendobj\n`;
+    return posicion;
+  });
+  const xref = Buffer.byteLength(pdf);
+  pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n`;
+  pdf += posiciones.map((p) => `${String(p).padStart(10, '0')} 00000 n \n`).join('');
+  pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return Buffer.from(pdf, 'latin1');
+}
+
+/** filas[0] son los encabezados. */
+function archivoReporte(url, nombreBase, titulo, filas, celda = celdaCsv) {
+  const formato = url.searchParams.get('formato') ?? 'CSV';
+  if (formato === 'PDF') {
+    return {
+      archivo: pdfSimple(
+        titulo,
+        filas.map((f) => f.join('  |  ')),
+      ),
+      tipo: 'application/pdf',
+      nombre: `${nombreBase}.pdf`,
+    };
+  }
+  if (formato !== 'CSV') {
+    throw new Problema(400, 'PARAMETRO_INVALIDO', "El parámetro 'formato' tiene un valor inválido.");
+  }
+  return {
+    archivo: `﻿${filas.map((f) => f.map(celda).join(';')).join('\r\n')}\r\n`,
+    tipo: 'text/csv; charset=UTF-8',
+    nombre: `${nombreBase}.csv`,
+  };
+}
+
+const fechaCorta = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
+const TEXTO_ESTADO_STOCK = { SIN_STOCK: 'Sin stock', STOCK_BAJO: 'Stock bajo', OK: 'OK' };
+const TEXTO_ESTADO_LOTE = {
+  VIGENTE: 'Vigente',
+  POR_VENCER: 'Por vencer',
+  VENCIDO: 'Vencido',
+  AGOTADO: 'Agotado',
+};
+
+ruta('GET', '/api/medicamentos/exportar', 'LECTURA', ({ url }) => {
+  const q = (url.searchParams.get('q') ?? '').toLowerCase();
+  const estado = url.searchParams.get('estado');
+  const activo = url.searchParams.get('activo');
+  const lista = medicamentos
+    .map(aMedicamento)
+    .filter((m) => !q || m.codigo.toLowerCase().includes(q) || m.nombre.toLowerCase().includes(q))
+    .filter((m) => !estado || m.estadoStock === estado)
+    .filter((m) => activo === null || String(m.activo) === activo)
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  const filas = [
+    [
+      'Código',
+      'Nombre',
+      'Presentación',
+      'Stock total',
+      'Stock mínimo',
+      'Próximo vencimiento',
+      'Estado',
+      'Activo',
+    ],
+    ...lista.map((m) => [
+      m.codigo,
+      m.nombre,
+      m.presentacion,
+      m.stockTotal,
+      m.stockMinimo,
+      fechaCorta(m.proximoVencimiento),
+      TEXTO_ESTADO_STOCK[m.estadoStock],
+      m.activo ? 'Sí' : 'No',
+    ]),
+  ];
+  return archivoReporte(url, 'stock_medicamentos', 'Stock de medicamentos', filas);
+});
+
+ruta('GET', '/api/lotes/exportar', 'LECTURA', ({ url }) => {
+  const estados = url.searchParams.getAll('estado');
+  const medicamentoId = url.searchParams.get('medicamentoId');
+  const lista = lotes
+    .map(aLote)
+    .filter((l) => estados.length === 0 || estados.includes(l.estado))
+    .filter((l) => !medicamentoId || String(l.medicamentoId) === medicamentoId)
+    .sort((a, b) => a.fechaVencimiento.localeCompare(b.fechaVencimiento));
+  const filas = [
+    [
+      'Medicamento',
+      'Lote',
+      'Proveedor',
+      'Vencimiento',
+      'Días',
+      'Cantidad actual',
+      'Cantidad inicial',
+      'Ingreso',
+      'Estado',
+    ],
+    ...lista.map((l) => [
+      l.medicamento,
+      l.numeroLote,
+      l.proveedor,
+      fechaCorta(l.fechaVencimiento),
+      l.diasParaVencer,
+      l.cantidadActual,
+      l.cantidadInicial,
+      fechaCorta(l.fechaIngreso),
+      TEXTO_ESTADO_LOTE[l.estado],
+    ]),
+  ];
+  return archivoReporte(url, 'lotes_vencimientos', 'Lotes y vencimientos', filas);
+});
+
 // ---------- Servidor ----------
 
 const sesiones = new Map();
@@ -1199,12 +1390,12 @@ createServer(async (peticion, respuesta) => {
     const [, id] = encontrada.patron.exec(url.pathname);
     const cuerpo = ['POST', 'PUT', 'PATCH'].includes(peticion.method) ? await leerCuerpo(peticion) : {};
     const resultado = encontrada.manejador({ url, id, cuerpo, usuario });
-    if (resultado.csv) {
+    if (resultado.archivo !== undefined) {
       respuesta.writeHead(200, {
-        'Content-Type': 'text/csv; charset=UTF-8',
+        'Content-Type': resultado.tipo,
         'Content-Disposition': `attachment; filename="${resultado.nombre}"`,
       });
-      respuesta.end(resultado.csv);
+      respuesta.end(resultado.archivo);
       return;
     }
     responder(respuesta, resultado.status ?? 200, resultado.cuerpo);

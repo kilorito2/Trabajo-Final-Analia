@@ -43,6 +43,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/recuperacion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SolicitudRecuperacionRequest"];
+                };
+            };
+            responses: {
+                /** @description Aceptado */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SolicitudRecuperacionResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/recuperacion/confirmar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConfirmacionRecuperacionRequest"];
+                };
+            };
+            responses: {
+                /** @description Sin contenido */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -672,6 +748,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/medicamentos/exportar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    q?: string;
+                    estado?: components["schemas"]["EstadoStock"];
+                    activo?: boolean;
+                    formato?: components["parameters"]["formato"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: components["responses"]["Archivo"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/medicamentos/{id}": {
         parameters: {
             query?: never;
@@ -845,6 +953,37 @@ export interface paths {
                         "application/json": components["schemas"]["PagedModelLoteResponse"];
                     };
                 };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lotes/exportar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    medicamentoId?: number;
+                    estado?: components["schemas"]["EstadoLote"][];
+                    formato?: components["parameters"]["formato"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: components["responses"]["Archivo"];
             };
         };
         put?: never;
@@ -1096,6 +1235,7 @@ export interface paths {
                     desde: string;
                     hasta: string;
                     areaId?: number;
+                    formato?: components["parameters"]["formato"];
                 };
                 header?: never;
                 path?: never;
@@ -1103,13 +1243,42 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description CSV */
+                200: components["responses"]["Archivo"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/transferencias/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["id"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description PDF */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/csv": string;
+                        "application/pdf": string;
                     };
                 };
             };
@@ -1206,6 +1375,20 @@ export interface components {
         EstadoLote: "VIGENTE" | "POR_VENCER" | "VENCIDO" | "AGOTADO";
         /** @enum {string} */
         TipoMovimiento: "INGRESO" | "EGRESO" | "BAJA_VENCIMIENTO" | "AJUSTE";
+        /** @enum {string} */
+        FormatoReporte: "CSV" | "PDF";
+        SolicitudRecuperacionRequest: {
+            username: string;
+        };
+        SolicitudRecuperacionResponse: {
+            mensaje: string;
+            codigoSimulado?: string | null;
+        };
+        ConfirmacionRecuperacionRequest: {
+            username: string;
+            codigo: string;
+            passwordNueva: string;
+        };
         PageMetadata: {
             number: number;
             size: number;
@@ -1505,12 +1688,24 @@ export interface components {
             page: components["schemas"]["PageMetadata"];
         };
     };
-    responses: never;
+    responses: {
+        /** @description CSV (para Excel) o PDF */
+        Archivo: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "text/csv": string;
+                "application/pdf": string;
+            };
+        };
+    };
     parameters: {
         id: number;
         page: number;
         size: number;
         sort: string;
+        formato: components["schemas"]["FormatoReporte"];
     };
     requestBodies: never;
     headers: never;

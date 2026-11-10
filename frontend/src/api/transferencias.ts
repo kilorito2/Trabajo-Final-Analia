@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, descargar } from './cliente';
+import { api } from './cliente';
 import { invalidarStock } from './invalidaciones';
 import type { PaginaTransferencias, Transferencia, TransferenciaRequest } from './tipos';
 
@@ -36,9 +36,4 @@ export function useCrearTransferencia() {
       return invalidarStock(queryClient);
     },
   });
-}
-
-/** Descarga el CSV con todo lo filtrado (no solo la página visible). */
-export function exportarTransferencias(filtros: { desde: string; hasta: string; areaId?: number }) {
-  return descargar('/api/transferencias/exportar', filtros);
 }

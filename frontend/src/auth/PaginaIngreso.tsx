@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router';
-import { BellRing, ClipboardCheck, ShieldCheck } from 'lucide-react';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { iniciarSesion } from '../api/auth';
 import { MENSAJES, mensajeDeError } from '../api/errores';
-import { Logo, Marca } from '../components/Logo';
+import { Logo } from '../components/Logo';
+import { MarcoIngreso } from './MarcoIngreso';
 import { useSesion } from './SesionProvider';
 
 function destinoGuardado(estado: unknown): string {
@@ -27,6 +27,7 @@ export function PaginaIngreso() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const recuperada = parametros.get('motivo') === 'recuperada';
   const [error, setError] = useState<string | null>(
     parametros.get('motivo') === 'expirada' ? MENSAJES.sesionExpirada : null,
   );
@@ -53,74 +54,58 @@ export function PaginaIngreso() {
   }
 
   return (
-    <main className="ingreso">
-      <title>Ingresar · Farmacia</title>
-      <section className="ingreso__presentacion" aria-label="Presentación">
-        <Marca subtitulo="Hospital público" />
-        <div className="ingreso__mensaje">
-          <p className="ingreso__titular">Control de stock de la farmacia del hospital</p>
-          <p>Medicamentos, lotes y vencimientos en un solo lugar, con trazabilidad de cada unidad.</p>
+    <MarcoIngreso titulo="Ingresar">
+      <form className="ingreso__tarjeta" onSubmit={enviar} noValidate>
+        <div className="ingreso__encabezado">
+          <Logo tamano={40} />
+          <h1>Ingresar</h1>
+          <p className="texto-suave">Usá el usuario que te dio el administrador.</p>
         </div>
-        <ul className="ingreso__puntos">
-          <li>
-            <ClipboardCheck size={20} aria-hidden="true" />
-            Transferencias a las áreas por orden de vencimiento
-          </li>
-          <li>
-            <BellRing size={20} aria-hidden="true" />
-            Alertas de lotes por vencer y de stock bajo
-          </li>
-          <li>
-            <ShieldCheck size={20} aria-hidden="true" />
-            Acceso por roles y registro de cada movimiento
-          </li>
-        </ul>
-      </section>
-      <div className="ingreso__lado-formulario">
-        <form className="ingreso__tarjeta" onSubmit={enviar} noValidate>
-          <div className="ingreso__encabezado">
-            <Logo tamano={40} />
-            <h1>Ingresar</h1>
-            <p className="texto-suave">Usá el usuario que te dio el administrador.</p>
-          </div>
-          {error && (
-            <p className="mensaje mensaje--peligro" role="alert">
-              {error}
-            </p>
-          )}
-          <div className="campo">
-            <label className="campo__etiqueta" htmlFor="usuario">
-              Usuario
-            </label>
-            <input
-              id="usuario"
-              className="control"
-              autoComplete="username"
-              // El foco inicial va al usuario: es lo único que se hace en esta pantalla.
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div className="campo">
-            <label className="campo__etiqueta" htmlFor="password">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              className="control"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="boton boton--primario ingreso__boton" disabled={enviando}>
-            {enviando ? 'Ingresando…' : 'Ingresar'}
-          </button>
-        </form>
-      </div>
-    </main>
+        {recuperada && !error && (
+          <p className="mensaje mensaje--ok" role="status">
+            Listo, ya podés ingresar con tu contraseña nueva.
+          </p>
+        )}
+        {error && (
+          <p className="mensaje mensaje--peligro" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="campo">
+          <label className="campo__etiqueta" htmlFor="usuario">
+            Usuario
+          </label>
+          <input
+            id="usuario"
+            className="control"
+            autoComplete="username"
+            // El foco inicial va al usuario: es lo único que se hace en esta pantalla.
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div className="campo">
+          <label className="campo__etiqueta" htmlFor="password">
+            Contraseña
+          </label>
+          <input
+            id="password"
+            className="control"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <button type="submit" className="boton boton--primario ingreso__boton" disabled={enviando}>
+          {enviando ? 'Ingresando…' : 'Ingresar'}
+        </button>
+        <div className="ingreso__pie">
+          <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
+        </div>
+      </form>
+    </MarcoIngreso>
   );
 }

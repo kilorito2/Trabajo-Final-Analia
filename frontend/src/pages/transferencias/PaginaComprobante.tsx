@@ -1,9 +1,11 @@
 import { Link, useParams } from 'react-router';
-import { Printer } from 'lucide-react';
+import { FileDown, Printer } from 'lucide-react';
+import { descargarComprobante } from '../../api/reportes';
 import { useTransferencia } from '../../api/transferencias';
 import { useSesion } from '../../auth/SesionProvider';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
 import { Cargando, ErrorCarga } from '../../components/Estados';
+import { useDescarga } from '../../hooks/useDescarga';
 import { formatearFecha, formatearFechaHora } from '../../utils/fechas';
 import { formatearNumero } from '../../utils/numeros';
 
@@ -11,6 +13,7 @@ export function PaginaComprobante() {
   const id = Number(useParams().id);
   const { puede } = useSesion();
   const consulta = useTransferencia(id);
+  const descarga = useDescarga();
 
   if (consulta.isPending) return <Cargando />;
   if (consulta.isError) return <ErrorCarga error={consulta.error} alReintentar={() => consulta.refetch()} />;
@@ -28,6 +31,15 @@ export function PaginaComprobante() {
               <button type="button" className="boton boton--primario" onClick={() => window.print()}>
                 <Printer size={16} aria-hidden="true" />
                 Imprimir
+              </button>
+              <button
+                type="button"
+                className="boton"
+                disabled={descarga.enCurso !== null}
+                onClick={() => void descarga.descargar('PDF', () => descargarComprobante(id))}
+              >
+                <FileDown size={16} aria-hidden="true" />
+                {descarga.enCurso ? 'Descargando…' : 'Descargar PDF'}
               </button>
               {puede('TRANSFERENCIA_CREAR') && (
                 <Link to="/transferencias/nueva" className="boton">

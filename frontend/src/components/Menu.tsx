@@ -5,6 +5,7 @@ import {
   CalendarClock,
   CircleUserRound,
   ClipboardList,
+  FileChartColumn,
   LayoutDashboard,
   LogOut,
   PackagePlus,
@@ -46,6 +47,7 @@ const GRUPOS: Grupo[] = [
     enlaces: [
       { ruta: '/medicamentos', texto: 'Medicamentos', permiso: 'LECTURA', icono: Pill },
       { ruta: '/transferencias', texto: 'Transferencias', permiso: 'LECTURA', icono: ClipboardList },
+      { ruta: '/reportes', texto: 'Reportes', permiso: 'LECTURA', icono: FileChartColumn },
     ],
   },
   {

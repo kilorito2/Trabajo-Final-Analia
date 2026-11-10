@@ -137,12 +137,16 @@ export const api = {
   patch: <T>(ruta: string, cuerpo: unknown) => pedirJson<T>('PATCH', ruta, { cuerpo }),
 };
 
-/** Pide un archivo (el CSV de transferencias) y dispara su descarga. */
-export async function descargar(ruta: string, parametros?: Parametros): Promise<void> {
-  const respuesta = await ejecutar(ruta, { metodo: 'GET', parametros, acepta: 'text/csv' });
+/** Pide un archivo (CSV o PDF) y dispara su descarga. */
+export async function descargar(
+  ruta: string,
+  parametros?: Parametros,
+  acepta: 'text/csv' | 'application/pdf' = 'text/csv',
+): Promise<void> {
+  const respuesta = await ejecutar(ruta, { metodo: 'GET', parametros, acepta });
   const nombre = nombreDesdeContentDisposition(
     respuesta.headers.get('Content-Disposition'),
-    'exportacion.csv',
+    acepta === 'application/pdf' ? 'reporte.pdf' : 'exportacion.csv',
   );
   guardarArchivo(await respuesta.blob(), nombre);
 }

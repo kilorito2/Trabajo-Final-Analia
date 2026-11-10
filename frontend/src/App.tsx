@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
 import { crearQueryClient } from './api/consultas';
 import { PaginaIngreso } from './auth/PaginaIngreso';
+import { PaginaRecuperacion } from './auth/PaginaRecuperacion';
 import { PaginaSinPermiso } from './auth/PaginaSinPermiso';
 import { RutaProtegida } from './auth/RutaProtegida';
 import { SesionProvider } from './auth/SesionProvider';
@@ -19,6 +20,7 @@ import { PaginaMedicamentos } from './pages/medicamentos/PaginaMedicamentos';
 import { PaginaNoEncontrada } from './pages/PaginaNoEncontrada';
 import { PaginaPanel } from './pages/panel/PaginaPanel';
 import { PaginaProveedores } from './pages/proveedores/PaginaProveedores';
+import { PaginaReportes } from './pages/reportes/PaginaReportes';
 import { PaginaComprobante } from './pages/transferencias/PaginaComprobante';
 import { PaginaNuevaTransferencia } from './pages/transferencias/PaginaNuevaTransferencia';
 import { PaginaTransferencias } from './pages/transferencias/PaginaTransferencias';
@@ -35,6 +37,7 @@ const router = createBrowserRouter([
     ),
     children: [
       { path: 'ingresar', element: <PaginaIngreso /> },
+      { path: 'recuperar', element: <PaginaRecuperacion /> },
       {
         element: <RutaProtegida />,
         children: [
@@ -84,6 +87,7 @@ const router = createBrowserRouter([
                   { path: 'transferencias', element: <PaginaTransferencias /> },
                   { path: 'transferencias/:id', element: <PaginaComprobante /> },
                   { path: 'lotes', element: <PaginaLotes /> },
+                  { path: 'reportes', element: <PaginaReportes /> },
                   { path: 'proveedores', element: <PaginaProveedores /> },
                   { path: 'areas', element: <PaginaAreas /> },
                   {

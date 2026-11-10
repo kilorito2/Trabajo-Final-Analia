@@ -1,15 +1,14 @@
-import { useState } from 'react';
 import { Link } from 'react-router';
-import { Download, Plus } from 'lucide-react';
+import { Download, FileText, Plus } from 'lucide-react';
 import { useAreas } from '../../api/areas';
-import { mensajeDeError } from '../../api/errores';
-import { exportarTransferencias, useTransferencias } from '../../api/transferencias';
-import type { TransferenciaResumen } from '../../api/tipos';
+import { exportarTransferencias } from '../../api/reportes';
+import { useTransferencias } from '../../api/transferencias';
+import type { FormatoReporte, TransferenciaResumen } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
-import { useAvisos } from '../../components/Avisos';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
 import { Paginador } from '../../components/Paginador';
 import { Tabla, type Columna } from '../../components/Tabla';
+import { useDescarga } from '../../hooks/useDescarga';
 import { useFiltrosUrl } from '../../hooks/useFiltrosUrl';
 import { diasEntre, formatearFechaHora, hoy, sumarDias } from '../../utils/fechas';
 import { formatearNumero } from '../../utils/numeros';
@@ -48,9 +47,8 @@ const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 export function PaginaTransferencias() {
   const filtros = useFiltrosUrl();
   const { puede } = useSesion();
-  const { avisar } = useAvisos();
   const areas = useAreas({ size: 100, sort: 'nombre,asc' });
-  const [exportando, setExportando] = useState(false);
+  const descarga = useDescarga();
 
   const desde = filtros.leer('desde', sumarDias(hoy(), -DIAS_POR_DEFECTO));
   const hasta = filtros.leer('hasta', hoy());
@@ -73,16 +71,9 @@ export function PaginaTransferencias() {
     problemaExportacion = `Para exportar, el rango puede ser de hasta ${MAXIMO_DIAS_EXPORTACION} días.`;
   }
 
-  async function exportar() {
-    if (problemaExportacion || exportando) return;
-    setExportando(true);
-    try {
-      await exportarTransferencias({ desde, hasta, areaId });
-    } catch (error) {
-      avisar('error', mensajeDeError(error));
-    } finally {
-      setExportando(false);
-    }
+  function exportar(formato: FormatoReporte) {
+    if (problemaExportacion) return;
+    void descarga.descargar(formato, () => exportarTransferencias({ desde, hasta, areaId }, formato));
   }
 
   return (
@@ -94,12 +85,22 @@ export function PaginaTransferencias() {
             <button
               type="button"
               className="boton"
-              onClick={exportar}
-              disabled={Boolean(problemaExportacion) || exportando}
+              onClick={() => exportar('CSV')}
+              disabled={Boolean(problemaExportacion) || descarga.enCurso !== null}
               aria-describedby={problemaExportacion ? 'problema-exportacion' : undefined}
             >
               <Download size={16} aria-hidden="true" />
-              {exportando ? 'Exportando…' : 'Exportar a Excel'}
+              {descarga.enCurso === 'CSV' ? 'Exportando…' : 'Exportar a Excel'}
+            </button>
+            <button
+              type="button"
+              className="boton"
+              onClick={() => exportar('PDF')}
+              disabled={Boolean(problemaExportacion) || descarga.enCurso !== null}
+              aria-describedby={problemaExportacion ? 'problema-exportacion' : undefined}
+            >
+              <FileText size={16} aria-hidden="true" />
+              {descarga.enCurso === 'PDF' ? 'Exportando…' : 'Exportar a PDF'}
             </button>
             {puede('TRANSFERENCIA_CREAR') && (
               <Link to="/transferencias/nueva" className="boton boton--primario">
