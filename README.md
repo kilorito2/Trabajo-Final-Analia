@@ -2,7 +2,8 @@
 
 Sistema de control de stock para la farmacia de un hospital público: catálogo de medicamentos,
 ingreso de lotes, transferencias a las áreas con criterio FEFO, bajas por vencimiento, ajustes,
-alertas y exportación a Excel. Trabajo final de la Tecnicatura Universitaria en Programación (UTN).
+alertas, recuperación de contraseña y reportes en Excel (CSV) y PDF. Trabajo final de la
+Tecnicatura Universitaria en Programación (UTN).
 
 Este repo es un monorepo: `backend/` (Spring Boot 4.1, Java 21), `frontend/` y `docs/`.
 
@@ -79,3 +80,6 @@ Antes de commitear: `./mvnw spotless:apply`.
 - Pedidos listos para probar: `docs/api/farmacia.http`
 - Especificación y criterios de aceptación: `docs/spec.md`
 - Decisiones de diseño: `docs/decisiones.md`
+- Modelo de datos (diagrama entidad-relación y 3FN): `docs/modelo-datos.md`
+- Cumplimiento de la consigna del TFI: `docs/consigna.md`
+- Mejora propuesta y presupuesto: `docs/presupuesto.md`

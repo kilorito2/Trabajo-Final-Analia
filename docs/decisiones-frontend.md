@@ -27,6 +27,11 @@ Se fusiona con `docs/decisiones.md` cuando el backend cree ese archivo.
 | Borrador de la transferencia en `sessionStorage`, validado al leerlo | Estado solo en memoria | Si la sesión vence o el backend responde 409, no se pierde lo cargado. Un borrador con forma inválida se descarta. |
 | Doble clic en "Confirmar transferencia" bloqueado con un `ref` además del botón deshabilitado | Solo `disabled` | El segundo clic puede llegar antes de que React vuelva a renderizar el botón deshabilitado. |
 | Redirección después del ingreso solo a rutas internas | Usar `state.desde` tal cual | Evita redirigir a otro sitio con un `state` manipulado. |
+| Estilo hospitalario: menú lateral oscuro, logo de cruz sanitaria, tarjetas con sombra suave e íconos de Lucide | Mantener el estilo plano inicial | Se ve más profesional y reconocible como sistema de salud sin perder contraste AA: los colores nuevos están verificados en `tokens.css` y axe no reporta violaciones graves. |
+| Pantalla **Reportes** que agrupa los reportes, con "Ver en pantalla" y descarga en Excel (CSV) o PDF | Un botón de exportar en cada listado | La consigna exige reportes (mostrar y exportar). Juntos se encuentran fácil; el historial de transferencias y el comprobante mantienen además sus propios botones. |
+| Descargas con `useDescarga`: un estado por botón y el error como aviso | Estado de carga en cada pantalla | El mismo patrón en Reportes, Transferencias y el comprobante. |
+| Recuperación de contraseña en `/recuperar` con el mismo marco que el ingreso (`MarcoIngreso`) | Un modal en el ingreso | Es un flujo de dos pasos y conviene tener una URL propia para enlazarla. El código simulado se muestra como "correo simulado". |
+| Si el foco sale de un campo hacia el botón de enviar, no se valida al salir | Validar siempre al salir | El mensaje de error desaparecía al apretar el botón, el botón subía y el clic caía afuera. El envío valida todo igual. |
 
 ## Diferencias con el contrato (`Back_v2.md` §8)
 

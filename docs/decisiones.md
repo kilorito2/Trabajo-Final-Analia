@@ -73,3 +73,18 @@ decidió y por qué.
     tests se inyectan como parámetros de `@BeforeEach`, sin `@Autowired` en campos.
 12. **Endpoint de prueba para el 500.** `ControladorDePrueba` existe solo en `src/test` y lanza una
     excepción para verificar que el 500 tiene `errorId` y no expone el stacktrace.
+13. **Recuperación de contraseña simulada.** La consigna del TFI la pide "real o simulada" y los
+    usuarios no tienen correo cargado. Se pide con el usuario, se genera un código de 6 números con
+    `SecureRandom`, se guarda con BCrypt en `recuperacion_password` y vence en 15 minutos. El envío
+    pasa por la interfaz `NotificadorRecuperacion`: hoy `CorreoSimulado` solo deja constancia en el
+    log (sin el código) y, con `farmacia.recuperacion.mostrar-codigo` (perfiles `demo` y `test`), la
+    respuesta trae el código para mostrarlo en pantalla. Un envío real se agrega implementando la
+    interfaz. La respuesta es la misma exista o no el usuario y el hash se calcula siempre, para no
+    revelar qué usuarios hay. Los intentos fallidos se cuentan con bloqueo pesimista y la
+    transacción no se revierte en ese error (`noRollbackFor`), así el contador queda guardado.
+14. **Reportes en CSV y PDF desde el mismo modelo.** Cada servicio arma un `Reporte` (título,
+    filtros, columnas y filas ya formateadas) y `Exportador` lo convierte. Así el CSV y el PDF
+    muestran siempre los mismos datos y agregar un reporte es armar las filas. El PDF usa OpenPDF
+    (libre, LGPL/MPL) con la identidad del sistema; el CSV mantiene el formato que ya usaba Excel.
+    `formato` es un parámetro del mismo endpoint de cada listado (`/exportar`), con los mismos
+    filtros, y por defecto es CSV para no romper a los clientes existentes.

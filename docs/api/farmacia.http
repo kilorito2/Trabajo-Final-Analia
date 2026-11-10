@@ -15,6 +15,19 @@ Content-Type: application/json
 ###
 @token = {{login.response.body.token}}
 
+### Recuperar la contraseña: pedir el código (público; en demo la respuesta trae el código)
+# @name recuperacion
+POST {{baseUrl}}/api/auth/recuperacion
+Content-Type: application/json
+
+{"username": "consulta"}
+
+### Recuperar la contraseña: usar el código
+POST {{baseUrl}}/api/auth/recuperacion/confirmar
+Content-Type: application/json
+
+{"username": "consulta", "codigo": "{{recuperacion.response.body.codigoSimulado}}", "passwordNueva": "clave-nueva-123"}
+
 ### Mi sesión y permisos
 GET {{baseUrl}}/api/auth/me
 Authorization: Bearer {{token}}
@@ -148,6 +161,22 @@ Authorization: Bearer {{token}}
 
 ### Exportar a Excel (CSV)
 GET {{baseUrl}}/api/transferencias/exportar?desde=2026-11-01&hasta={{hoy}}
+Authorization: Bearer {{token}}
+
+### Reporte de transferencias en PDF
+GET {{baseUrl}}/api/transferencias/exportar?desde=2026-11-01&hasta={{hoy}}&formato=PDF
+Authorization: Bearer {{token}}
+
+### Comprobante en PDF
+GET {{baseUrl}}/api/transferencias/1/pdf
+Authorization: Bearer {{token}}
+
+### Reporte de stock de medicamentos con stock bajo (PDF)
+GET {{baseUrl}}/api/medicamentos/exportar?estado=STOCK_BAJO&formato=PDF
+Authorization: Bearer {{token}}
+
+### Reporte de lotes vencidos y por vencer (CSV)
+GET {{baseUrl}}/api/lotes/exportar?estado=VENCIDO&estado=POR_VENCER&formato=CSV
 Authorization: Bearer {{token}}
 
 ### Alertas
