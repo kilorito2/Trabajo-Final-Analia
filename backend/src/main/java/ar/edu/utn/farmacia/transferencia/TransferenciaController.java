@@ -1,5 +1,7 @@
 package ar.edu.utn.farmacia.transferencia;
 
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -9,9 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/transferencias")
 @RequiredArgsConstructor
 public class TransferenciaController {
-
-  private static final MediaType CSV = MediaType.parseMediaType("text/csv;charset=UTF-8");
 
   private final TransferenciaService transferenciaService;
 
@@ -58,19 +55,23 @@ public class TransferenciaController {
     return transferenciaService.obtener(id);
   }
 
+  @GetMapping("/{id}/pdf")
+  @PreAuthorize("hasAuthority('LECTURA')")
+  public ResponseEntity<byte[]> comprobantePdf(@PathVariable Long id) {
+    byte[] pdf = transferenciaService.comprobantePdf(id);
+    return Exportador.descarga(
+        pdf, "transferencia_" + Transferencia.numero(id), FormatoReporte.PDF);
+  }
+
+  /** Reporte de transferencias en Excel (XLSX), CSV o PDF. */
   @GetMapping("/exportar")
   @PreAuthorize("hasAuthority('LECTURA')")
   public ResponseEntity<byte[]> exportar(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
-      @RequestParam(required = false) Long areaId) {
-    byte[] csv = transferenciaService.exportar(desde, hasta, areaId);
-    String archivo = "transferencias_" + desde + "_" + hasta + ".csv";
-    return ResponseEntity.ok()
-        .contentType(CSV)
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            ContentDisposition.attachment().filename(archivo).build().toString())
-        .body(csv);
+      @RequestParam(required = false) Long areaId,
+      @RequestParam(defaultValue = "CSV") FormatoReporte formato) {
+    byte[] contenido = transferenciaService.exportar(desde, hasta, areaId, formato);
+    return Exportador.descarga(contenido, "transferencias_" + desde + "_" + hasta, formato);
   }
 }

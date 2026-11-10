@@ -137,12 +137,25 @@ export const api = {
   patch: <T>(ruta: string, cuerpo: unknown) => pedirJson<T>('PATCH', ruta, { cuerpo }),
 };
 
-/** Pide un archivo (el CSV de transferencias) y dispara su descarga. */
-export async function descargar(ruta: string, parametros?: Parametros): Promise<void> {
-  const respuesta = await ejecutar(ruta, { metodo: 'GET', parametros, acepta: 'text/csv' });
+// Nombre por si la respuesta no trae Content-Disposition.
+const NOMBRE_POR_DEFECTO = {
+  'text/csv': 'exportacion.csv',
+  'application/pdf': 'reporte.pdf',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'reporte.xlsx',
+} as const;
+
+export type TipoArchivo = keyof typeof NOMBRE_POR_DEFECTO;
+
+/** Pide un archivo (CSV, Excel o PDF) y dispara su descarga. */
+export async function descargar(
+  ruta: string,
+  parametros?: Parametros,
+  acepta: TipoArchivo = 'text/csv',
+): Promise<void> {
+  const respuesta = await ejecutar(ruta, { metodo: 'GET', parametros, acepta });
   const nombre = nombreDesdeContentDisposition(
     respuesta.headers.get('Content-Disposition'),
-    'exportacion.csv',
+    NOMBRE_POR_DEFECTO[acepta],
   );
   guardarArchivo(await respuesta.blob(), nombre);
 }

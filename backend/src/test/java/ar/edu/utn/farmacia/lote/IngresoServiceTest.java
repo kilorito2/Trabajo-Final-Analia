@@ -13,6 +13,7 @@ import ar.edu.utn.farmacia.Entidades;
 import ar.edu.utn.farmacia.RelojFijoConfig;
 import ar.edu.utn.farmacia.auth.UsuarioActual;
 import ar.edu.utn.farmacia.common.ErrorDeCampoException;
+import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
 import ar.edu.utn.farmacia.medicamento.MedicamentoRepository;
 import ar.edu.utn.farmacia.proveedor.ProveedorRepository;
@@ -46,6 +47,7 @@ class IngresoServiceTest {
             proveedorRepository,
             usuarioActual,
             Entidades.propiedades(),
+            new Exportador(RelojFijoConfig.reloj()),
             RelojFijoConfig.reloj());
     lenient()
         .when(medicamentoRepository.findById(10L))

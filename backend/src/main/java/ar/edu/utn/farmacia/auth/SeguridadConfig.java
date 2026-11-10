@@ -56,7 +56,13 @@ public class SeguridadConfig {
         .sessionManagement(sesion -> sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             pedidos -> {
-              pedidos.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll();
+              pedidos
+                  .requestMatchers(
+                      HttpMethod.POST,
+                      "/api/auth/login",
+                      "/api/auth/recuperacion",
+                      "/api/auth/recuperacion/confirmar")
+                  .permitAll();
               pedidos.requestMatchers("/actuator/health").permitAll();
               if (swaggerHabilitado) {
                 pedidos.requestMatchers(RUTAS_SWAGGER).permitAll();

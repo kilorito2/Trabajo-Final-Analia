@@ -1,3 +1,5 @@
 farmacia:
   demo:
     password: ${DEMO_PASSWORD:demo1234}
+  recuperacion:
+    mostrar-codigo: true

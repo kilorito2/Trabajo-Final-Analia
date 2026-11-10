@@ -15,6 +15,10 @@ export type LoginRequest = Esquemas['LoginRequest'];
 export type LoginResponse = Esquemas['LoginResponse'];
 export type UsuarioSesion = Esquemas['UsuarioSesion'];
 export type CambioPasswordRequest = Esquemas['CambioPasswordRequest'];
+export type SolicitudRecuperacionRequest = Esquemas['SolicitudRecuperacionRequest'];
+export type SolicitudRecuperacionResponse = Esquemas['SolicitudRecuperacionResponse'];
+export type ConfirmacionRecuperacionRequest = Esquemas['ConfirmacionRecuperacionRequest'];
+export type FormatoReporte = Esquemas['FormatoReporte'];
 
 export type Usuario = Esquemas['UsuarioResponse'];
 export type UsuarioRequest = Esquemas['UsuarioRequest'];

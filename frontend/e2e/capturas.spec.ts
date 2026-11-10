@@ -27,6 +27,9 @@ test('capturas de todas las pantallas', async ({ page }) => {
     if (mensaje.type() === 'error') erroresConsola.push(mensaje.text());
   });
 
+  await page.goto('/recuperar');
+  await capturar(page, '00-recuperar-contrasena');
+
   await page.goto('/ingresar');
   await capturar(page, '01-ingreso');
   await page.getByLabel('Usuario').fill(USUARIO);
@@ -84,6 +87,10 @@ test('capturas de todas las pantallas', async ({ page }) => {
 
   await page.goto('/cuenta');
   await capturar(page, '14-mi-cuenta');
+
+  await page.goto('/reportes');
+  await expect(page.getByRole('heading', { name: 'Reportes', level: 1 })).toBeVisible();
+  await capturar(page, '15-reportes');
 
   expect(erroresConsola, 'Errores en la consola del navegador').toEqual([]);
 });

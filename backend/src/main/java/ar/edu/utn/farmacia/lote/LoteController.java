@@ -1,5 +1,7 @@
 package ar.edu.utn.farmacia.lote;
 
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.Set;
@@ -37,6 +39,17 @@ public class LoteController {
       @RequestParam(required = false) Set<EstadoLote> estado,
       @PageableDefault(size = 20, sort = "fechaVencimiento") Pageable pagina) {
     return loteService.listar(medicamentoId, estado, pagina);
+  }
+
+  /** Reporte de lotes y vencimientos en Excel (XLSX), CSV o PDF. */
+  @GetMapping("/api/lotes/exportar")
+  @PreAuthorize("hasAuthority('LECTURA')")
+  public ResponseEntity<byte[]> exportar(
+      @RequestParam(required = false) Long medicamentoId,
+      @RequestParam(required = false) Set<EstadoLote> estado,
+      @RequestParam(defaultValue = "CSV") FormatoReporte formato) {
+    byte[] contenido = loteService.exportar(medicamentoId, estado, formato);
+    return Exportador.descarga(contenido, "lotes_vencimientos", formato);
   }
 
   @PostMapping("/api/lotes/{id}/baja")

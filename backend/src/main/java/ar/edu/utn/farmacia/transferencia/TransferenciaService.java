@@ -4,6 +4,8 @@ import ar.edu.utn.farmacia.area.Area;
 import ar.edu.utn.farmacia.area.AreaRepository;
 import ar.edu.utn.farmacia.auth.UsuarioActual;
 import ar.edu.utn.farmacia.common.ErrorDeCampoException;
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import ar.edu.utn.farmacia.common.Ordenamiento;
 import ar.edu.utn.farmacia.common.ParametroInvalidoException;
 import ar.edu.utn.farmacia.common.RecursoNoEncontradoException;
@@ -60,6 +62,7 @@ public class TransferenciaService {
   private final LoteRepository loteRepository;
   private final MovimientoStockRepository movimientoRepository;
   private final UsuarioActual usuarioActual;
+  private final Exportador exportador;
   private final Clock clock;
 
   @Transactional
@@ -158,7 +161,7 @@ public class TransferenciaService {
 
   /** Exporta todo lo filtrado, no solo la página visible. */
   @Transactional(readOnly = true)
-  public byte[] exportar(LocalDate desde, LocalDate hasta, Long areaId) {
+  public byte[] exportar(LocalDate desde, LocalDate hasta, Long areaId, FormatoReporte formato) {
     validarRango(desde, hasta);
     if (ChronoUnit.DAYS.between(desde, hasta) + 1 > DIAS_MAXIMOS_EXPORTACION) {
       throw new ParametroInvalidoException(
@@ -171,7 +174,20 @@ public class TransferenciaService {
         areaId == null
             ? transferenciaRepository.detalleParaExportar(inicio, fin)
             : transferenciaRepository.detalleParaExportar(inicio, fin, areaId);
-    return TransferenciaCsv.generar(lineas, clock.getZone());
+    List<String> filtros = new ArrayList<>();
+    filtros.add("Desde: " + desde.format(Exportador.FECHA));
+    filtros.add("Hasta: " + hasta.format(Exportador.FECHA));
+    if (areaId != null) {
+      filtros.add(
+          "Área: " + areaRepository.findById(areaId).map(Area::getNombre).orElse("#" + areaId));
+    }
+    return exportador.generar(
+        TransferenciaReporte.generar(lineas, clock.getZone(), filtros), formato);
+  }
+
+  @Transactional(readOnly = true)
+  public byte[] comprobantePdf(Long id) {
+    return ComprobantePdf.generar(obtener(id), clock.getZone(), exportador.generadoEn());
   }
 
   private Map<Long, Integer> sumarItems(List<TransferenciaRequest.Item> items) {

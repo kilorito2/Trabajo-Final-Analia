@@ -94,6 +94,18 @@ class MedicamentoConsultasImpl implements MedicamentoConsultas {
         .list();
   }
 
+  @Override
+  public List<MedicamentoConStock> todosConStock(
+      FiltroMedicamentos filtro, LocalDate hoy, Sort orden) {
+    Map<String, Object> parametros = new HashMap<>();
+    parametros.put("hoy", hoy);
+    return jdbcClient
+        .sql(COLUMNAS + DESDE + condiciones(filtro, parametros) + orden(orden))
+        .params(parametros)
+        .query(MedicamentoConsultasImpl::fila)
+        .list();
+  }
+
   private static String condiciones(FiltroMedicamentos filtro, Map<String, Object> parametros) {
     List<String> condiciones = new ArrayList<>();
     if (filtro.q() != null && !filtro.q().isBlank()) {

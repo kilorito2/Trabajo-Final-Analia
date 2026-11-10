@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -72,4 +73,8 @@ public interface LoteRepository extends JpaRepository<Lote, Long>, JpaSpecificat
   @Override
   @EntityGraph(attributePaths = {"medicamento", "proveedor"})
   Page<Lote> findAll(Specification<Lote> filtro, Pageable pagina);
+
+  @Override
+  @EntityGraph(attributePaths = {"medicamento", "proveedor"})
+  List<Lote> findAll(Specification<Lote> filtro, Sort orden);
 }

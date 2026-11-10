@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { iniciarSesion } from '../api/auth';
 import { MENSAJES, mensajeDeError } from '../api/errores';
+import { Marca } from '../components/Logo';
+import { MarcoIngreso } from './MarcoIngreso';
 import { useSesion } from './SesionProvider';
 
 function destinoGuardado(estado: unknown): string {
@@ -25,6 +27,7 @@ export function PaginaIngreso() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const recuperada = parametros.get('motivo') === 'recuperada';
   const [error, setError] = useState<string | null>(
     parametros.get('motivo') === 'expirada' ? MENSAJES.sesionExpirada : null,
   );
@@ -51,13 +54,18 @@ export function PaginaIngreso() {
   }
 
   return (
-    <main className="ingreso">
-      <title>Ingresar · Farmacia</title>
-      <form className="ingreso__tarjeta tarjeta" onSubmit={enviar} noValidate>
-        <div>
-          <h1>Farmacia</h1>
-          <p className="texto-suave">Control de stock del hospital</p>
+    <MarcoIngreso titulo="Ingresar">
+      <form className="ingreso__tarjeta" onSubmit={enviar} noValidate>
+        <div className="ingreso__encabezado">
+          <Marca />
+          <h1>Ingresar</h1>
+          <p className="texto-suave">Usá el usuario que te dio el administrador.</p>
         </div>
+        {recuperada && !error && (
+          <p className="mensaje mensaje--ok" role="status">
+            Listo, ya podés ingresar con tu contraseña nueva.
+          </p>
+        )}
         {error && (
           <p className="mensaje mensaje--peligro" role="alert">
             {error}
@@ -94,7 +102,10 @@ export function PaginaIngreso() {
         <button type="submit" className="boton boton--primario ingreso__boton" disabled={enviando}>
           {enviando ? 'Ingresando…' : 'Ingresar'}
         </button>
+        <div className="ingreso__pie">
+          <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
+        </div>
       </form>
-    </main>
+    </MarcoIngreso>
   );
 }

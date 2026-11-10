@@ -1,6 +1,8 @@
 package ar.edu.utn.farmacia.medicamento;
 
 import ar.edu.utn.farmacia.common.EstadoRequest;
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,19 @@ public class MedicamentoController {
       @RequestParam(required = false) Boolean activo,
       @PageableDefault(size = 20, sort = "nombre") Pageable pagina) {
     return medicamentoService.listar(new FiltroMedicamentos(q, estado, activo), pagina);
+  }
+
+  /** Reporte de stock en Excel (XLSX), CSV o PDF, con los filtros del listado. */
+  @GetMapping("/exportar")
+  @PreAuthorize("hasAuthority('LECTURA')")
+  public ResponseEntity<byte[]> exportar(
+      @RequestParam(required = false) String q,
+      @RequestParam(required = false) EstadoStock estado,
+      @RequestParam(required = false) Boolean activo,
+      @RequestParam(defaultValue = "CSV") FormatoReporte formato) {
+    byte[] contenido =
+        medicamentoService.exportar(new FiltroMedicamentos(q, estado, activo), formato);
+    return Exportador.descarga(contenido, "stock_medicamentos", formato);
   }
 
   @GetMapping("/{id}")

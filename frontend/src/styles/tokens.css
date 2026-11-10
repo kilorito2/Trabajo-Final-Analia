@@ -1,43 +1,65 @@
-/* Contrastes verificados contra WCAG AA sobre --color-superficie. */
+/* Contrastes verificados contra WCAG AA sobre --color-superficie (y sobre --menu-fondo en el menú). */
 :root {
-  --color-fondo: #f5f7f8;
+  --color-fondo: #f1f5f8;
+  --color-fondo-suave: #f7f9fb; /* encabezados de tabla y zonas secundarias */
   --color-superficie: #ffffff;
-  --color-texto: #1f2933; /* 14,8:1 */
-  --color-texto-suave: #52606d; /* 6,5:1 */
-  --color-borde: #d9e2e7; /* solo separadores decorativos */
+  --color-texto: #14232e; /* 15,9:1 */
+  --color-texto-suave: #4d5d6b; /* 6,6:1; 6,1:1 sobre --color-fondo */
+  --color-borde: #dfe6ec; /* solo separadores decorativos */
   --color-borde-control: #7b8794; /* bordes de campos: 3,7:1 (los controles necesitan 3:1) */
-  --color-primario: #0b5563; /* 8,4:1; el texto blanco encima también da 8,4:1 */
-  --color-primario-hover: #084450;
-  --color-primario-suave: #e3eef0; /* fondo del ítem activo; el primario encima da 7,1:1 */
-  --color-foco: #0b5563;
+  --color-primario: #0a6170; /* 6,9:1; el texto blanco encima también */
+  --color-primario-hover: #084e5a;
+  --color-primario-suave: #e2f1f2; /* fondo de selección; el primario encima da 6,0:1 */
+  --color-acento: #13a39a; /* decorativo: logo y marcas, nunca texto */
+  --color-foco: #0a6170;
+
+  /* Menú lateral oscuro. */
+  --menu-fondo: #0c2b36;
+  --menu-fondo-hover: #133a47;
+  --menu-fondo-activo: #17495a;
+  --menu-texto: #d3e2e7; /* 11,9:1 */
+  --menu-texto-suave: #8fb0bb; /* 6,4:1 */
+  --menu-borde: #1c4351;
+  --menu-foco: #7ddcd2;
 
   --peligro-texto: #9b1c1c;
-  --peligro-fondo: #fdecec;
+  --peligro-fondo: #fdeded;
+  --peligro-borde: #f5c2c2;
   --peligro-solido: #c62828; /* 7,1:1 */
   --aviso-texto: #7a4b00;
-  --aviso-fondo: #fff4db;
+  --aviso-fondo: #fff5de;
+  --aviso-borde: #f3d79b;
   --aviso-solido: #b45309; /* 6,8:1 */
   --ok-texto: #1e6b3a;
-  --ok-fondo: #e6f4ea;
+  --ok-fondo: #e7f5ec;
+  --ok-borde: #b8e0c5;
   --ok-solido: #2e7d32; /* 5,7:1 */
+  --info-texto: #0a5563;
+  --info-fondo: #e4f2f4;
 
   --esp-1: 4px;
   --esp-2: 8px;
   --esp-3: 12px;
   --esp-4: 16px;
+  --esp-5: 20px;
   --esp-6: 24px;
   --esp-8: 32px;
-  --radio: 6px;
-  --sombra: 0 1px 3px rgb(0 0 0 / 0.12); /* solo modales, menús y avisos */
+  --esp-10: 40px;
+  --radio: 8px;
+  --radio-lg: 12px;
+  --sombra-sm: 0 1px 2px rgb(12 43 54 / 0.05), 0 1px 3px rgb(12 43 54 / 0.06);
+  --sombra: 0 4px 12px rgb(12 43 54 / 0.1), 0 1px 3px rgb(12 43 54 / 0.08); /* modales, menús y avisos */
+  --sombra-lg: 0 16px 40px rgb(12 43 54 / 0.18);
 
   --fuente: 'IBM Plex Sans', system-ui, sans-serif;
+  --texto-xs: 0.75rem; /* 12 px: encabezados de tabla en mayúsculas */
   --texto-sm: 0.8125rem; /* 13 px: metadatos */
   --texto-base: 0.9375rem; /* 15 px */
-  --texto-lg: 1.25rem; /* 20 px: título de página */
+  --texto-lg: 1.5rem; /* 24 px: título de página */
 
-  --ancho-menu: 224px;
-  --alto-fila: 38px;
-  --alto-barra: 52px;
+  --ancho-menu: 248px;
+  --alto-fila: 44px;
+  --alto-barra: 56px;
   --transicion: 150ms ease;
 }
 

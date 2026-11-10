@@ -250,7 +250,6 @@ export function PaginaLotes() {
     {
       clave: 'dias',
       encabezado: 'Días',
-      sinCortar: true,
       celda: (l) => describirDiasParaVencer(l.diasParaVencer),
     },
     {
@@ -271,13 +270,14 @@ export function PaginaLotes() {
           {l.estado === 'VENCIDO' && (
             <button
               type="button"
-              className="boton boton--chico boton--texto"
+              className="boton boton--chico boton--peligro-suave"
               onClick={() => setDandoDeBaja(l)}
             >
-              Dar de baja por vencimiento<span className="solo-lectores"> el lote {l.numeroLote}</span>
+              Dar de baja
+              <span className="solo-lectores"> por vencimiento el lote {l.numeroLote}</span>
             </button>
           )}
-          <button type="button" className="boton boton--chico boton--texto" onClick={() => setAjustando(l)}>
+          <button type="button" className="boton boton--chico" onClick={() => setAjustando(l)}>
             Ajustar<span className="solo-lectores"> el lote {l.numeroLote}</span>
           </button>
         </div>

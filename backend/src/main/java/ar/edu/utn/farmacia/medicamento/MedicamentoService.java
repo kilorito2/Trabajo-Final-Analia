@@ -1,6 +1,8 @@
 package ar.edu.utn.farmacia.medicamento;
 
+import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.FarmaciaProperties;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import ar.edu.utn.farmacia.common.Ordenamiento;
 import ar.edu.utn.farmacia.common.RecursoNoEncontradoException;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
@@ -13,6 +15,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,7 @@ public class MedicamentoService {
   private final MedicamentoRepository medicamentoRepository;
   private final LoteRepository loteRepository;
   private final FarmaciaProperties propiedades;
+  private final Exportador exportador;
   private final Clock clock;
 
   @Transactional(readOnly = true)
@@ -34,6 +38,15 @@ public class MedicamentoService {
     return medicamentoRepository
         .buscarConStock(filtro, LocalDate.now(clock), pagina)
         .map(MedicamentoResponse::desde);
+  }
+
+  /** Reporte de stock con los mismos filtros que el listado, sin paginar. */
+  @Transactional(readOnly = true)
+  public byte[] exportar(FiltroMedicamentos filtro, FormatoReporte formato) {
+    List<MedicamentoConStock> filas =
+        medicamentoRepository.todosConStock(
+            filtro, LocalDate.now(clock), Sort.by("nombre", "codigo"));
+    return exportador.generar(MedicamentoReporte.generar(filas, filtro), formato);
   }
 
   @Transactional(readOnly = true)

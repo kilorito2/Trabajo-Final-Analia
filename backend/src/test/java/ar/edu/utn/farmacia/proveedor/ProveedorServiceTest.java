@@ -15,6 +15,7 @@ import ar.edu.utn.farmacia.Entidades;
 import ar.edu.utn.farmacia.RelojFijoConfig;
 import ar.edu.utn.farmacia.area.AreaRepository;
 import ar.edu.utn.farmacia.auth.UsuarioActual;
+import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
 import ar.edu.utn.farmacia.lote.IngresoRequest;
 import ar.edu.utn.farmacia.lote.Lote;
@@ -74,6 +75,7 @@ class ProveedorServiceTest {
             loteRepository,
             movimientoRepository,
             usuarioActual,
+            new Exportador(RelojFijoConfig.reloj()),
             RelojFijoConfig.reloj());
 
     transferencias.transferir(
@@ -95,6 +97,7 @@ class ProveedorServiceTest {
             proveedorRepository,
             usuarioActual,
             Entidades.propiedades(),
+            new Exportador(RelojFijoConfig.reloj()),
             RelojFijoConfig.reloj());
 
     assertThatThrownBy(

@@ -14,6 +14,17 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/LoginRequest' } } } }
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/LoginResponse' } } } }
+  /api/auth/recuperacion:
+    post:
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SolicitudRecuperacionRequest' } } } }
+      responses:
+        '202': { description: Aceptado, content: { application/json: { schema: { $ref: '#/components/schemas/SolicitudRecuperacionResponse' } } } }
+  /api/auth/recuperacion/confirmar:
+    post:
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ConfirmacionRecuperacionRequest' } } } }
+      responses: { '204': { description: Sin contenido } }
   /api/auth/me:
     get:
       responses:
@@ -121,6 +132,15 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoRequest' } } } }
       responses:
         '201': { description: Creado, content: { application/json: { schema: { $ref: '#/components/schemas/MedicamentoResponse' } } } }
+  /api/medicamentos/exportar:
+    get:
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { $ref: '#/components/schemas/EstadoStock' } }
+        - { name: activo, in: query, schema: { type: boolean } }
+        - $ref: '#/components/parameters/formato'
+      responses:
+        '200': { $ref: '#/components/responses/Archivo' }
   /api/medicamentos/{id}:
     get:
       parameters: [{ $ref: '#/components/parameters/id' }]
@@ -152,6 +172,14 @@ paths:
         - $ref: '#/components/parameters/sort'
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PagedModelLoteResponse' } } } }
+  /api/lotes/exportar:
+    get:
+      parameters:
+        - { name: medicamentoId, in: query, schema: { type: integer, format: int64 } }
+        - { name: estado, in: query, schema: { type: array, items: { $ref: '#/components/schemas/EstadoLote' } } }
+        - $ref: '#/components/parameters/formato'
+      responses:
+        '200': { $ref: '#/components/responses/Archivo' }
   /api/lotes/{id}/baja:
     post:
       parameters: [{ $ref: '#/components/parameters/id' }]
@@ -203,8 +231,14 @@ paths:
         - { name: desde, in: query, required: true, schema: { type: string, format: date } }
         - { name: hasta, in: query, required: true, schema: { type: string, format: date } }
         - { name: areaId, in: query, schema: { type: integer, format: int64 } }
+        - $ref: '#/components/parameters/formato'
       responses:
-        '200': { description: CSV, content: { text/csv: { schema: { type: string } } } }
+        '200': { $ref: '#/components/responses/Archivo' }
+  /api/transferencias/{id}/pdf:
+    get:
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses:
+        '200': { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
   /api/alertas:
     get:
       responses:
@@ -221,12 +255,38 @@ components:
     page: { name: page, in: query, schema: { type: integer, minimum: 0, default: 0 } }
     size: { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
     sort: { name: sort, in: query, schema: { type: string } }
+    formato: { name: formato, in: query, schema: { $ref: '#/components/schemas/FormatoReporte' } }
+  responses:
+    Archivo:
+      description: Excel (XLSX), CSV o PDF
+      content:
+        text/csv: { schema: { type: string } }
+        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: { schema: { type: string, format: binary } }
+        application/pdf: { schema: { type: string, format: binary } }
   schemas:
     Rol: { type: string, enum: [ADMIN, FARMACEUTICO, CONSULTA] }
     Permiso: { type: string, enum: [LECTURA, CATALOGO_EDITAR, STOCK_INGRESAR, STOCK_BAJA_AJUSTE, TRANSFERENCIA_CREAR, USUARIO_GESTIONAR] }
     EstadoStock: { type: string, enum: [SIN_STOCK, STOCK_BAJO, OK] }
     EstadoLote: { type: string, enum: [VIGENTE, POR_VENCER, VENCIDO, AGOTADO] }
     TipoMovimiento: { type: string, enum: [INGRESO, EGRESO, BAJA_VENCIMIENTO, AJUSTE] }
+    FormatoReporte: { type: string, enum: [CSV, XLSX, PDF] }
+    SolicitudRecuperacionRequest:
+      type: object
+      required: [username]
+      properties: { username: { type: string } }
+    SolicitudRecuperacionResponse:
+      type: object
+      required: [mensaje]
+      properties:
+        mensaje: { type: string }
+        codigoSimulado: { type: [string, 'null'] }
+    ConfirmacionRecuperacionRequest:
+      type: object
+      required: [username, codigo, passwordNueva]
+      properties:
+        username: { type: string }
+        codigo: { type: string }
+        passwordNueva: { type: string }
     PageMetadata:
       type: object
       required: [number, size, totalElements, totalPages]
