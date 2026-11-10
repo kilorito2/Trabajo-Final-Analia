@@ -245,7 +245,7 @@
   }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1099px) {
   .menu > .menu__marca {
     display: none;
   }
@@ -381,6 +381,17 @@
 .boton--peligro:hover:not(:disabled) {
   border-color: var(--peligro-texto);
   background: var(--peligro-texto);
+}
+
+/* Acción destructiva dentro de una tabla: borde y texto rojos, sin el fondo lleno. */
+.boton--peligro-suave {
+  border-color: var(--peligro-solido);
+  color: var(--peligro-texto);
+}
+
+.boton--peligro-suave:hover:not(:disabled) {
+  border-color: var(--peligro-texto);
+  background: var(--peligro-fondo);
 }
 
 .boton--texto {
@@ -718,12 +729,11 @@ textarea.control {
   background: var(--color-borde);
 }
 
-/* Los botones pasan a otro renglón si no entran, en vez de ensanchar la tabla. */
+/* Uno al lado del otro y separados, para no apretar el botón equivocado. */
 .tabla__acciones {
   display: flex;
-  flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0 var(--esp-1);
+  gap: var(--esp-2);
 }
 
 .tabla__acciones .boton {
