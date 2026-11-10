@@ -4,7 +4,7 @@ import { ArrowLeft, MailCheck } from 'lucide-react';
 import { confirmarRecuperacion, solicitarRecuperacion } from '../api/auth';
 import type { SolicitudRecuperacionResponse } from '../api/tipos';
 import { CampoFormulario } from '../components/CampoFormulario';
-import { Logo } from '../components/Logo';
+import { Marca } from '../components/Logo';
 import { useFormulario } from '../hooks/useFormulario';
 import { combinar, longitudEntre, obligatorio } from '../utils/validaciones';
 import { MarcoIngreso } from './MarcoIngreso';
@@ -74,7 +74,7 @@ export function PaginaRecuperacion() {
         }}
       >
         <div className="ingreso__encabezado">
-          <Logo tamano={40} />
+          <Marca />
           <h1>Recuperar la contraseña</h1>
           <p className="texto-suave">
             {solicitud

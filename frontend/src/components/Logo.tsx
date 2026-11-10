@@ -1,5 +1,5 @@
 /** Cruz sanitaria sobre un cuadrado redondeado. Decorativa: el nombre va siempre al lado en texto. */
-export function Logo({ tamano = 32 }: { tamano?: number }) {
+function Logo({ tamano = 32 }: { tamano?: number }) {
   return (
     <svg className="logo" width={tamano} height={tamano} viewBox="0 0 32 32" aria-hidden="true">
       <rect className="logo__fondo" width="32" height="32" rx="8" />

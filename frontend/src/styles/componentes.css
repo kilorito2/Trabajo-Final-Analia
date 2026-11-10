@@ -224,7 +224,9 @@
   .contenido {
     padding: var(--esp-6) var(--esp-6) var(--esp-8);
   }
+}
 
+@media (max-width: 1365px) {
   /* .contenido sube la especificidad: las reglas de .tabla están más abajo en el archivo. */
   .contenido .tabla th,
   .contenido .tabla td {
@@ -233,6 +235,13 @@
 
   .contenido .tabla th {
     white-space: normal;
+  }
+}
+
+@media (max-width: 1199px) {
+  .contenido .tabla th,
+  .contenido .tabla td {
+    padding: var(--esp-2) 6px;
   }
 }
 
@@ -616,6 +625,9 @@ textarea.control {
 /* ---------- Tabla ---------- */
 
 .tabla-contenedor {
+  /* Posicionado: así los textos .solo-lectores de las celdas (absolutos) quedan dentro del
+     desplazamiento de la tabla y no ensanchan la página. */
+  position: relative;
   overflow-x: auto;
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
@@ -706,8 +718,15 @@ textarea.control {
   background: var(--color-borde);
 }
 
+/* Los botones pasan a otro renglón si no entran, en vez de ensanchar la tabla. */
 .tabla__acciones {
-  text-align: right;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 var(--esp-1);
+}
+
+.tabla__acciones .boton {
   white-space: nowrap;
 }
 
@@ -1200,10 +1219,17 @@ textarea.control {
   background: linear-gradient(90deg, var(--color-primario), var(--color-acento));
 }
 
-@media (max-width: 1200px) {
+/* Las dos columnas solo cuando la tabla de últimas transferencias entra completa. */
+@media (max-width: 1439px) {
   .panel {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Último recurso en pantallas angostas: la tabla se desplaza dentro de su tarjeta. */
+.panel .tarjeta {
+  min-width: 0;
+  overflow-x: auto;
 }
 
 @media (max-width: 1100px) {
@@ -1312,88 +1338,8 @@ textarea.control {
 
 .ingreso {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  min-height: 100vh;
-  background: var(--color-superficie);
-}
-
-.ingreso__presentacion {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--esp-8);
-  padding: var(--esp-10) clamp(var(--esp-8), 6vw, 80px);
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 85% 15%, rgb(19 163 154 / 0.35), transparent 45%),
-    linear-gradient(160deg, #0f3a48 0%, var(--menu-fondo) 60%, #08202a 100%);
-  color: var(--menu-texto);
-}
-
-/* Cruces sanitarias de fondo, puramente decorativas. */
-.ingreso__presentacion::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cpath d='M25 22h6v6h-6zM25 28h6v6h-6zM19 25h6v6h-6zM31 25h6v6h-6z' fill='%23ffffff' fill-opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-.ingreso__presentacion > * {
-  position: relative;
-  z-index: 1;
-}
-
-.ingreso__presentacion .marca__nombre {
-  color: #fff;
-}
-
-.ingreso__presentacion .marca__subtitulo {
-  color: var(--menu-texto-suave);
-}
-
-.ingreso__mensaje {
-  display: grid;
-  gap: var(--esp-4);
-  max-width: 460px;
-}
-
-.ingreso__titular {
-  font-size: clamp(1.75rem, 2.6vw, 2.375rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #fff;
-}
-
-.ingreso__puntos {
-  display: grid;
-  gap: var(--esp-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ingreso__puntos li {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-3);
-}
-
-.ingreso__puntos svg {
-  flex-shrink: 0;
-  padding: 7px;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radio);
-  background: rgb(255 255 255 / 0.08);
-  color: var(--menu-foco);
-}
-
-.ingreso__lado-formulario {
-  display: grid;
   place-items: center;
+  min-height: 100vh;
   padding: var(--esp-8) var(--esp-4);
   background: var(--color-fondo);
 }
@@ -1414,8 +1360,8 @@ textarea.control {
   gap: var(--esp-1);
 }
 
-.ingreso__encabezado .logo {
-  margin-bottom: var(--esp-3);
+.ingreso__encabezado .marca {
+  margin-bottom: var(--esp-5);
 }
 
 .ingreso__boton {
@@ -1440,18 +1386,4 @@ textarea.control {
   font-size: 1.5rem;
   letter-spacing: 0.2em;
   font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 900px) {
-  .ingreso {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .ingreso__presentacion {
-    display: none;
-  }
-
-  .ingreso__lado-formulario {
-    min-height: 100vh;
-  }
 }

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { iniciarSesion } from '../api/auth';
 import { MENSAJES, mensajeDeError } from '../api/errores';
-import { Logo } from '../components/Logo';
+import { Marca } from '../components/Logo';
 import { MarcoIngreso } from './MarcoIngreso';
 import { useSesion } from './SesionProvider';
 
@@ -57,7 +57,7 @@ export function PaginaIngreso() {
     <MarcoIngreso titulo="Ingresar">
       <form className="ingreso__tarjeta" onSubmit={enviar} noValidate>
         <div className="ingreso__encabezado">
-          <Logo tamano={40} />
+          <Marca />
           <h1>Ingresar</h1>
           <p className="texto-suave">Usá el usuario que te dio el administrador.</p>
         </div>
