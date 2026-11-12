@@ -22,7 +22,7 @@ sequenceDiagram
     Note over F,B: En cada pedido siguiente
     F->>B: GET /api/... con Authorization: Bearer <token>
     B->>B: validar firma, vencimiento y emisor
-    B->>D: buscar usuario por id; ¿activo? leer rol
+    B->>D: buscar usuario por id, ¿activo?, leer rol
     B->>B: permisos = permisos del rol actual
 ```
 

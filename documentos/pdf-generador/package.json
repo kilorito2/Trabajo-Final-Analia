@@ -1,0 +1,15 @@
+{
+  "name": "farmacia-documentos-pdf",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Genera los PDF de documentos/ a partir de los Markdown.",
+  "scripts": {
+    "pdf": "node generar.mjs"
+  },
+  "dependencies": {
+    "marked": "15.0.12",
+    "mermaid": "11.4.1",
+    "playwright": "1.65.0"
+  }
+}

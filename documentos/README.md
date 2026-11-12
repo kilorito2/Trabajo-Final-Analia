@@ -33,18 +33,29 @@ Buscá `[COMPLETAR]` en toda la carpeta (en VS Code: `Ctrl + Shift + F`). Son so
 personales y administrativos que el sistema no puede saber: nombre y apellido, legajo, comisión,
 docente o tutor, y fecha de entrega.
 
-## Cómo pasarlo a Word o PDF
+## PDF para entregar
 
-Los documentos están en Markdown (`.md`) porque se leen bien en GitHub, en VS Code y se pueden
-versionar con git. Para entregar en papel o en el campus:
+Los PDF ya generados están en [`pdf/`](pdf/):
 
-- **Con VS Code:** instalá la extensión *Markdown PDF* (yzane.markdown-pdf), abrí el archivo y
-  `Ctrl + Shift + P` → "Markdown PDF: Export (pdf)".
-- **Con Pandoc** (si lo tenés instalado), desde esta carpeta:
-  `pandoc tesis/informe-final.md -o informe-final.docx`
-- Los diagramas están escritos en **Mermaid** (bloques ` ```mermaid `). GitHub y VS Code (con la
-  extensión *Markdown Preview Mermaid Support*) los dibujan; para Word conviene exportarlos como
-  imagen desde https://mermaid.live.
+| PDF | Contenido |
+|---|---|
+| `01-informe-final.pdf` | La tesis. |
+| `02-carpeta-del-proyecto.pdf` | Los 10 documentos técnicos en un solo archivo, con portada e índice. |
+| `03-manual-de-usuario.pdf` | Manual de usuario. |
+| `04-guion-de-defensa.pdf` | Guion de la presentación, la demo y las preguntas. |
+| `05-carpeta-de-estudio.pdf` | Los 18 archivos de estudio en un solo archivo, con portada e índice. |
+
+**Después de editar un `.md`** (por ejemplo, al completar los `[COMPLETAR]`), regenerá los PDF:
+
+```bash
+cd documentos/pdf-generador
+npm install        # solo la primera vez
+npm run pdf
+```
+
+El generador (`pdf-generador/generar.mjs`) convierte el Markdown a HTML, dibuja los diagramas
+Mermaid y exporta a PDF A4 con Chromium (el mismo que usa Playwright en el frontend). Si algún
+diagrama tiene un error de sintaxis, lo informa en la consola.
 
 Las capturas de pantalla del sistema están en `docs/capturas/` y se regeneran con
 `npm run capturas` desde `frontend/`.
