@@ -129,7 +129,7 @@ alertas, resumen, transferencias y proveedores.
 | `CasillaInactivos` | "Incluir inactivos". |
 | `EncabezadoPagina` | Título de la página + `<title>` de la pestaña + acciones. |
 | `LimiteErrores` | Atrapa errores inesperados de React y muestra un mensaje. |
-| `Logo` | Logo (cruz) y marca. |
+| `Logo` | Logo (escudo con cruz sanitaria, en SVG) y marca. |
 
 ## 6. `hooks/`
 

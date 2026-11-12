@@ -1,11 +1,18 @@
 /* ---------- Marca ---------- */
 
-.logo__fondo {
-  fill: var(--color-acento);
+.logo__anillo {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.45);
+  stroke-width: 1;
 }
 
 .logo__cruz {
   fill: #fff;
+}
+
+/* Sombra suave: sobre el menú oscuro el escudo se despega del fondo. */
+.marca .logo {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.25));
 }
 
 .marca {
@@ -273,8 +280,8 @@
   }
 
   .barra-superior .logo {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
 
   .barra-superior .boton {

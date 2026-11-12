@@ -14,6 +14,12 @@ const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const DOCUMENTOS = path.resolve(AQUI, '..');
 const SALIDA = path.join(DOCUMENTOS, 'pdf');
 const MERMAID = path.join(AQUI, 'node_modules', 'mermaid', 'dist', 'mermaid.min.js');
+// El mismo escudo que el logo del sistema (frontend/public/favicon.svg).
+const ESCUDO = `<svg viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="escudo" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#1bb5a9"/><stop offset="1" stop-color="#0a6170"/></linearGradient></defs>
+  <path fill="url(#escudo)" d="M20 2 35 7.5V19c0 9.4-6.4 16.4-15 19C11.4 35.4 5 28.4 5 19V7.5Z"/>
+  <path fill="none" stroke="#fff" stroke-opacity=".45" d="M20 5.2 32 9.6V19c0 7.8-5.2 13.7-12 16-6.8-2.3-12-8.2-12-16V9.6Z"/>
+  <rect fill="#fff" x="16.5" y="10" width="7" height="18" rx="1.6"/><rect fill="#fff" x="11" y="15.5" width="18" height="7" rx="1.6"/></svg>`;
 const SUBTITULO = 'Sistema de Gestión de Stock — Farmacia Hospitalaria';
 
 const carpeta = (dir, nombres) => nombres.map((n) => `${dir}/${n}`);
@@ -197,10 +203,7 @@ hr { border: 0; border-top: 0.6pt solid #dfe6ec; margin: 12pt 0; }
 input[type=checkbox] { margin-right: 4pt; }
 .portada { height: 255mm; display: flex; flex-direction: column; justify-content: center; break-after: page; page-break-after: always; }
 .portada .marca { display: flex; align-items: center; gap: 10pt; color: #0a6170; font-weight: 600; font-size: 12pt; margin-bottom: 40pt; }
-.portada .cruz { width: 34pt; height: 34pt; border-radius: 7pt; background: #13a39a; position: relative; }
-.portada .cruz::before, .portada .cruz::after { content: ""; position: absolute; background: #fff; border-radius: 1.5pt; }
-.portada .cruz::before { left: 14pt; top: 7pt; width: 6pt; height: 20pt; }
-.portada .cruz::after { left: 7pt; top: 14pt; width: 20pt; height: 6pt; }
+.portada .marca svg { width: 40pt; height: 40pt; }
 .portada h1 { font-size: 34pt; border: 0; margin: 0 0 8pt; padding: 0; }
 .portada .sub { font-size: 14pt; color: #0a6170; margin: 0 0 18pt; }
 .portada .desc { font-size: 11pt; color: #4d5d6b; max-width: 140mm; }
@@ -212,7 +215,7 @@ input[type=checkbox] { margin-right: 4pt; }
 
 function portada(pdf) {
   return `<section class="portada">
-    <div class="marca"><span class="cruz"></span>Farmacia Hospitalaria</div>
+    <div class="marca">${ESCUDO}Farmacia Hospitalaria</div>
     <h1>${pdf.titulo}</h1>
     <p class="sub">${SUBTITULO}</p>
     ${pdf.descripcion ? `<p class="desc">${pdf.descripcion}</p>` : ''}
