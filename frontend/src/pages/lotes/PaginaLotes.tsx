@@ -4,6 +4,8 @@ import { useAjustarLote, useDarDeBajaLote, useLotes } from '../../api/lotes';
 import type { EstadoLote, Lote } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
 import { useAvisos } from '../../components/Avisos';
+import { exportarLotes } from '../../api/reportes';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { CampoBusqueda } from '../../components/CampoBusqueda';
 import { CampoFormulario } from '../../components/CampoFormulario';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
@@ -296,7 +298,17 @@ export function PaginaLotes() {
 
   return (
     <>
-      <EncabezadoPagina titulo="Lotes y vencimientos" />
+      <EncabezadoPagina
+        titulo="Lotes y vencimientos"
+        acciones={
+          <BotonesExportar
+            que="los lotes"
+            exportar={(formato) =>
+              exportarLotes({ q: busqueda || undefined, estado: [...VISTAS[vista].estados] }, formato)
+            }
+          />
+        }
+      />
       <div className="filtros">
         <CampoBusqueda etiqueta="Buscar por medicamento, lote o proveedor" />
         <div className="campo">

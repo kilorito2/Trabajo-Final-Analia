@@ -120,6 +120,11 @@ servir: usá **Pedir otro código**.
 
 Todas las listas (medicamentos, lotes, transferencias…) funcionan igual:
 
+- **Exportar**: los botones **Excel** y **PDF** de arriba a la derecha descargan la lista con los
+  filtros que tengas aplicados (toda, no solo la página que ves). Están en el Panel (alertas),
+  Medicamentos, el detalle de cada medicamento (movimientos), Lotes y vencimientos,
+  Transferencias, Proveedores, Áreas y Usuarios.
+
 - **Buscar**: escribí en el buscador; la lista se actualiza sola al dejar de escribir.
 - **Filtros**: los desplegables de arriba (estado, área, fechas).
 - **Incluir inactivos**: marcala para ver también lo que fue dado de baja.
@@ -233,8 +238,9 @@ para **la firma de quien entrega y de quien recibe**. **Descargar PDF** guarda e
 
 ![Lotes vencidos](../../docs/capturas/10-lotes-vencidos.png)
 
-En el menú, **Lotes y vencimientos**. Con **Mostrar** elegís: **Vencidos**, **Por vencer** o
-**Todos con stock**. La columna **Días** dice "Vence en N días" o "Venció hace N días".
+En el menú, **Lotes y vencimientos**. Con **Buscar por medicamento, lote o proveedor** encontrás un
+lote escribiendo parte del nombre o código del medicamento, el número de lote o el proveedor. Con
+**Mostrar** elegís: **Vencidos**, **Por vencer** o **Todos con stock**. La columna **Días** dice "Vence en N días" o "Venció hace N días".
 
 ### Dar de baja un lote vencido
 
@@ -314,13 +320,14 @@ En el menú, **Transferencias**. Por defecto muestra los **últimos 30 días**. 
 
 ![Reportes](../../docs/capturas/15-reportes.png)
 
-En el menú, **Reportes**. Hay tres:
+En el menú, **Reportes**. Hay cuatro:
 
 | Reporte | Qué muestra | Filtros |
 |---|---|---|
 | **Stock de medicamentos** | Stock disponible, mínimo, próximo vencimiento y estado de cada medicamento. | Estado, Incluir inactivos. |
 | **Lotes y vencimientos** | Lotes con su vencimiento, días restantes, cantidad y proveedor, ordenados por fecha. | Vencidos y por vencer, Solo vencidos, Solo por vencer, Todos con stock. |
 | **Transferencias a áreas** | Cada medicamento entregado: número, fecha, área, lote, vencimiento y cantidad. | Desde, Hasta, Área. |
+| **Alertas** | Lotes vencidos y por vencer, medicamentos sin stock y con stock bajo, como en el Panel. | Sin filtros: la situación de ese momento. |
 
 En cada uno:
 

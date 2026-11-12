@@ -1,6 +1,8 @@
 package ar.edu.utn.farmacia.proveedor;
 
 import ar.edu.utn.farmacia.common.EstadoRequest;
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,17 @@ public class ProveedorController {
       @RequestParam(required = false) Boolean activo,
       @PageableDefault(size = 20, sort = "razonSocial") Pageable pagina) {
     return proveedorService.listar(q, activo, pagina);
+  }
+
+  /** Proveedores en Excel (XLSX), CSV o PDF, con los filtros del listado. */
+  @GetMapping("/exportar")
+  @PreAuthorize("hasAuthority('LECTURA')")
+  public ResponseEntity<byte[]> exportar(
+      @RequestParam(required = false) String q,
+      @RequestParam(required = false) Boolean activo,
+      @RequestParam(defaultValue = "CSV") FormatoReporte formato) {
+    return Exportador.descarga(
+        proveedorService.exportar(q, activo, formato), "proveedores", formato);
   }
 
   @GetMapping("/{id}")

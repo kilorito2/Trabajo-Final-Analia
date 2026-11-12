@@ -20,8 +20,8 @@ Pirámide de pruebas: muchas pruebas chicas y rápidas abajo, pocas grandes arri
 
 | Nivel | Cantidad | Cómo se corre | Tiempo aprox. |
 |---|---|---|---|
-| Backend (unitarias `*Test` + integración `*IT`) | 94 | `cd backend && ./mvnw verify` (necesita Docker) | 1–3 min |
-| Frontend (Vitest) | 97 | `cd frontend && npm test` | 15 s |
+| Backend (unitarias `*Test` + integración `*IT`) | 100 | `cd backend && ./mvnw verify` (necesita Docker) | 1–3 min |
+| Frontend (Vitest) | 99 | `cd frontend && npm test` | 15 s |
 | Punta a punta + axe | 1 recorrido, 16 pantallas | `cd frontend && npm run capturas` (con la app levantada) | 25 s |
 
 **Reloj fijo:** en las pruebas del backend, "hoy" es una fecha fija (bean `Clock` `@Primary`), así

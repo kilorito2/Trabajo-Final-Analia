@@ -34,6 +34,18 @@ public class Exportador {
     return "Generado el " + ZonedDateTime.now(clock).format(FECHA_HORA);
   }
 
+  /** Sin el filtro "activo", los listados incluyen los dados de baja. */
+  public static String filtroActivo(Boolean activo) {
+    if (activo == null) {
+      return "Incluye inactivos";
+    }
+    return activo ? "Solo activos" : "Solo inactivos";
+  }
+
+  public static String siNo(boolean valor) {
+    return valor ? "Sí" : "No";
+  }
+
   public static ResponseEntity<byte[]> descarga(
       byte[] contenido, String nombreBase, FormatoReporte formato) {
     String archivo = nombreBase + "." + formato.extension();

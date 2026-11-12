@@ -4,13 +4,19 @@ import {
   ArrowRightLeft,
   CalendarClock,
   Eye,
+  OctagonAlert,
   FileSpreadsheet,
   FileText,
   Pill,
   type LucideIcon,
 } from 'lucide-react';
 import { useAreas } from '../../api/areas';
-import { exportarLotes, exportarMedicamentos, exportarTransferencias } from '../../api/reportes';
+import {
+  exportarAlertas,
+  exportarLotes,
+  exportarMedicamentos,
+  exportarTransferencias,
+} from '../../api/reportes';
 import type { EstadoLote, EstadoStock, FormatoReporte } from '../../api/tipos';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
 import { useDescarga } from '../../hooks/useDescarga';
@@ -283,6 +289,22 @@ function ReporteTransferencias() {
   );
 }
 
+function ReporteAlertas() {
+  const descarga = useDescarga();
+  return (
+    <TarjetaReporte
+      icono={OctagonAlert}
+      titulo="Alertas"
+      descripcion="Lotes vencidos y por vencer, medicamentos sin stock y con stock bajo, como en el panel."
+      enPantalla="/"
+      enCurso={descarga.enCurso}
+      alExportar={(formato) => void descarga.descargar(formato, () => exportarAlertas(formato))}
+    >
+      <p className="texto-suave">Siempre con la situación de este momento: no tiene filtros.</p>
+    </TarjetaReporte>
+  );
+}
+
 export function PaginaReportes() {
   return (
     <>
@@ -295,6 +317,7 @@ export function PaginaReportes() {
         <ReporteStock />
         <ReporteLotes />
         <ReporteTransferencias />
+        <ReporteAlertas />
       </div>
     </>
   );

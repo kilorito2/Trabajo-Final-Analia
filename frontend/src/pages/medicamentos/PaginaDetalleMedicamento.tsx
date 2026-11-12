@@ -2,10 +2,12 @@ import { useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router';
 import { PackagePlus, Pencil } from 'lucide-react';
 import { mensajeDeError } from '../../api/errores';
+import { exportarMovimientos } from '../../api/reportes';
 import { useMovimientos } from '../../api/lotes';
 import { useCambiarEstadoMedicamento, useMedicamento } from '../../api/medicamentos';
 import type { Lote, Movimiento, TipoMovimiento } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { useAvisos } from '../../components/Avisos';
 import { Confirmacion } from '../../components/Confirmacion';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
@@ -169,7 +171,13 @@ export function PaginaDetalleMedicamento() {
       </section>
 
       <section className="seccion" aria-labelledby="titulo-movimientos">
-        <h2 id="titulo-movimientos">Movimientos</h2>
+        <div className="seccion__encabezado">
+          <h2 id="titulo-movimientos">Movimientos</h2>
+          <BotonesExportar
+            que="los movimientos de este medicamento"
+            exportar={(formato) => exportarMovimientos({ medicamentoId: id }, formato)}
+          />
+        </div>
         <Tabla
           titulo="Movimientos de stock, del más reciente al más antiguo"
           columnas={columnasMovimientos}

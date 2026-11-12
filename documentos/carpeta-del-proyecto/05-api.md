@@ -42,6 +42,7 @@ Permiso: el que exige cada ruta (ver la matriz en [06-seguridad.md](06-seguridad
 | `PUT /api/usuarios/{id}` | USUARIO_GESTIONAR | `{nombreCompleto, rol}` | 200 |
 | `PATCH /api/usuarios/{id}/estado` | USUARIO_GESTIONAR | `{activo}` | 204 |
 | `PATCH /api/usuarios/{id}/password` | USUARIO_GESTIONAR | `{passwordNueva}` | 204 |
+| `GET /api/usuarios/exportar` | USUARIO_GESTIONAR | `q`, `activo`, `formato` (sin contraseñas ni hash) | Archivo `usuarios.*` |
 
 ### Proveedores y áreas
 
@@ -52,9 +53,11 @@ Permiso: el que exige cada ruta (ver la matriz en [06-seguridad.md](06-seguridad
 | `POST /api/proveedores` | CATALOGO_EDITAR | `{razonSocial, cuit, telefono, email}` | 201 |
 | `PUT /api/proveedores/{id}` | CATALOGO_EDITAR | ídem | 200 |
 | `PATCH /api/proveedores/{id}/estado` | CATALOGO_EDITAR | `{activo}` | 204 |
+| `GET /api/proveedores/exportar` | LECTURA | `q`, `activo`, `formato` | Archivo `proveedores.*` |
 | `GET /api/areas` | LECTURA | `q`, `activo`; orden: `nombre` | Página |
 | `POST /api/areas` · `PUT /api/areas/{id}` | CATALOGO_EDITAR | `{nombre}` | 201 / 200 |
 | `PATCH /api/areas/{id}/estado` | CATALOGO_EDITAR | `{activo}` | 204 |
+| `GET /api/areas/exportar` | LECTURA | `q`, `activo`, `formato` | Archivo `areas.*` |
 
 ### Medicamentos
 
@@ -77,6 +80,7 @@ Permiso: el que exige cada ruta (ver la matriz en [06-seguridad.md](06-seguridad
 | `POST /api/lotes/{id}/baja` | STOCK_BAJA_AJUSTE | `{motivo}` | 200 lote |
 | `POST /api/lotes/{id}/ajuste` | STOCK_BAJA_AJUSTE | `{cantidadNueva, motivo}` | 200 lote |
 | `GET /api/movimientos` | LECTURA | `loteId`, `medicamentoId`, `tipo`, `desde`, `hasta`; orden: `fechaHora` (desc) | Página |
+| `GET /api/movimientos/exportar` | LECTURA | mismos filtros + `formato` | Archivo `movimientos_stock.*` |
 
 ### Transferencias
 
@@ -93,6 +97,7 @@ Permiso: el que exige cada ruta (ver la matriz en [06-seguridad.md](06-seguridad
 | Método y ruta | Permiso | Respuesta |
 |---|---|---|
 | `GET /api/alertas` | LECTURA | `{diasPorVencer, sinStock[], stockBajo[], vencidos[], porVencer[]}` |
+| `GET /api/alertas/exportar` | LECTURA | Archivo `alertas.*` (`formato=CSV\|XLSX\|PDF`) |
 | `GET /api/resumen` | LECTURA | `{totales, diasPorVencer, medicamentosActivos, transferenciasHoy, ultimasTransferencias[5], egresosPorArea[]}` |
 
 ### Infraestructura

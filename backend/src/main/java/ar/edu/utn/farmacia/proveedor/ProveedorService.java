@@ -1,5 +1,7 @@
 package ar.edu.utn.farmacia.proveedor;
 
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import ar.edu.utn.farmacia.common.Ordenamiento;
 import ar.edu.utn.farmacia.common.RecursoNoEncontradoException;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +26,33 @@ public class ProveedorService {
   static final Set<String> ORDEN_PERMITIDO = Set.of("razonSocial");
 
   private final ProveedorRepository proveedorRepository;
+  private final Exportador exportador;
 
   @Transactional(readOnly = true)
   public Page<ProveedorResponse> listar(String q, Boolean activo, Pageable pagina) {
     Ordenamiento.validar(pagina.getSort(), ORDEN_PERMITIDO);
+    Page<Proveedor> proveedores = proveedorRepository.findAll(filtro(q, activo), pagina);
+    Map<Long, Long> lotes = contarLotes(proveedores.map(Proveedor::getId).getContent());
+    return proveedores.map(
+        proveedor -> ProveedorResponse.desde(proveedor, lotes.getOrDefault(proveedor.getId(), 0L)));
+  }
+
+  /** Reporte con los mismos filtros que el listado, ordenado por razón social. */
+  @Transactional(readOnly = true)
+  public byte[] exportar(String q, Boolean activo, FormatoReporte formato) {
+    List<Proveedor> proveedores =
+        proveedorRepository.findAll(filtro(q, activo), Sort.by("razonSocial"));
+    Map<Long, Long> lotes = contarLotes(proveedores.stream().map(Proveedor::getId).toList());
+    List<ProveedorResponse> filas =
+        proveedores.stream()
+            .map(
+                proveedor ->
+                    ProveedorResponse.desde(proveedor, lotes.getOrDefault(proveedor.getId(), 0L)))
+            .toList();
+    return exportador.generar(ProveedorReporte.generar(filas, q, activo), formato);
+  }
+
+  private Specification<Proveedor> filtro(String q, Boolean activo) {
     List<Specification<Proveedor>> filtros = new ArrayList<>();
     if (q != null && !q.isBlank()) {
       String patron = "%" + q.strip().toLowerCase(Locale.ROOT) + "%";
@@ -40,10 +66,7 @@ public class ProveedorService {
     if (activo != null) {
       filtros.add((raiz, consulta, cb) -> cb.equal(raiz.get("activo"), activo));
     }
-    Page<Proveedor> proveedores = proveedorRepository.findAll(Specification.allOf(filtros), pagina);
-    Map<Long, Long> lotes = contarLotes(proveedores.map(Proveedor::getId).getContent());
-    return proveedores.map(
-        proveedor -> ProveedorResponse.desde(proveedor, lotes.getOrDefault(proveedor.getId(), 0L)));
+    return Specification.allOf(filtros);
   }
 
   @Transactional(readOnly = true)

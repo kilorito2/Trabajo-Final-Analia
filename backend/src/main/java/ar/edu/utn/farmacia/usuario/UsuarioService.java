@@ -2,6 +2,8 @@ package ar.edu.utn.farmacia.usuario;
 
 import ar.edu.utn.farmacia.auth.Rol;
 import ar.edu.utn.farmacia.auth.UsuarioActual;
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import ar.edu.utn.farmacia.common.Ordenamiento;
 import ar.edu.utn.farmacia.common.RecursoNoEncontradoException;
 import ar.edu.utn.farmacia.common.ReglaNegocioException;
@@ -14,6 +16,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,11 +31,26 @@ public class UsuarioService {
   private final UsuarioRepository usuarioRepository;
   private final PasswordEncoder passwordEncoder;
   private final UsuarioActual usuarioActual;
+  private final Exportador exportador;
   private final Clock clock;
 
   @Transactional(readOnly = true)
   public Page<UsuarioResponse> listar(String q, Boolean activo, Pageable pagina) {
     Ordenamiento.validar(pagina.getSort(), ORDEN_PERMITIDO);
+    return usuarioRepository.findAll(filtro(q, activo), pagina).map(UsuarioResponse::desde);
+  }
+
+  @Transactional(readOnly = true)
+  public byte[] exportar(String q, Boolean activo, FormatoReporte formato) {
+    List<UsuarioResponse> usuarios =
+        usuarioRepository.findAll(filtro(q, activo), Sort.by("username")).stream()
+            .map(UsuarioResponse::desde)
+            .toList();
+    return exportador.generar(
+        UsuarioReporte.generar(usuarios, clock.getZone(), q, activo), formato);
+  }
+
+  private static Specification<Usuario> filtro(String q, Boolean activo) {
     List<Specification<Usuario>> filtros = new ArrayList<>();
     if (q != null && !q.isBlank()) {
       String patron = "%" + q.strip().toLowerCase(Locale.ROOT) + "%";
@@ -45,9 +63,7 @@ public class UsuarioService {
     if (activo != null) {
       filtros.add((raiz, consulta, cb) -> cb.equal(raiz.get("activo"), activo));
     }
-    return usuarioRepository
-        .findAll(Specification.allOf(filtros), pagina)
-        .map(UsuarioResponse::desde);
+    return Specification.allOf(filtros);
   }
 
   @Transactional

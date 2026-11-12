@@ -77,6 +77,20 @@ del backend a criterios de aceptación verificables por endpoint. No agrega requ
 | `GET /api/transferencias/{id}/pdf` | Comprobante en PDF con lugar para las firmas, o 404. |
 | `GET /api/transferencias/exportar` | `desde` y `hasta` obligatorios, hasta 366 días (400 `PARAMETRO_INVALIDO`). `formato=CSV` (por defecto), `XLSX` o `PDF`. En CSV: `text/csv`, BOM UTF-8, separador `;`, fin de línea `\r\n`, fechas `dd/mm/aaaa HH:mm`. Una fila por línea de detalle. Valores que empiezan con `=`, `+`, `-`, `@`, tabulación o retorno de carro llevan `'` adelante. |
 
+## Exportaciones agregadas
+
+Todas aceptan `formato=CSV|XLSX|PDF` (CSV por defecto; otro valor: 400 `PARAMETRO_INVALIDO`), usan
+los mismos filtros que su listado sin paginar y llevan los filtros aplicados en el encabezado del
+PDF y del Excel.
+
+| Endpoint | Permiso | Filtros | Archivo |
+|---|---|---|---|
+| `GET /api/movimientos/exportar` | `LECTURA` | `loteId`, `medicamentoId`, `tipo`, `desde`, `hasta`; del más reciente al más antiguo | `movimientos_stock.*` |
+| `GET /api/proveedores/exportar` | `LECTURA` | `q`, `activo`; por razón social | `proveedores.*` |
+| `GET /api/areas/exportar` | `LECTURA` | `q`, `activo`; por nombre | `areas.*` |
+| `GET /api/usuarios/exportar` | `USUARIO_GESTIONAR` | `q`, `activo`; por usuario. Nunca incluye la contraseña ni el hash | `usuarios.*` |
+| `GET /api/alertas/exportar` | `LECTURA` | Sin filtros: las alertas de este momento, en el orden del panel | `alertas.*` |
+
 ## Alertas y resumen (`LECTURA`)
 
 | Endpoint | Criterios de aceptación |

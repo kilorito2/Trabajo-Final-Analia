@@ -48,7 +48,7 @@ class ProveedorServiceTest {
     Proveedor proveedor = Entidades.proveedor(1L, true);
     when(proveedorRepository.findById(1L)).thenReturn(Optional.of(proveedor));
 
-    new ProveedorService(proveedorRepository).cambiarEstado(1L, false);
+    new ProveedorService(proveedorRepository, null).cambiarEstado(1L, false);
 
     assertThat(proveedor.isActivo()).isFalse();
     verify(proveedorRepository, never()).delete(any(Proveedor.class));

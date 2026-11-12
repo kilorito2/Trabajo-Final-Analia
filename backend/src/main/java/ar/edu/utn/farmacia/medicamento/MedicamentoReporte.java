@@ -36,7 +36,7 @@ final class MedicamentoReporte {
                             ? ""
                             : m.proximoVencimiento().format(Exportador.FECHA),
                         texto(m.estado()),
-                        m.activo() ? "Sí" : "No"))
+                        Exportador.siNo(m.activo())))
             .toList();
     return new Reporte("Stock de medicamentos", filtros(filtro), COLUMNAS, filas);
   }
@@ -57,11 +57,7 @@ final class MedicamentoReporte {
     if (filtro.estado() != null) {
       filtros.add("Estado: " + texto(filtro.estado()));
     }
-    if (filtro.activo() == null) {
-      filtros.add("Incluye inactivos");
-    } else {
-      filtros.add(filtro.activo() ? "Solo activos" : "Solo inactivos");
-    }
+    filtros.add(Exportador.filtroActivo(filtro.activo()));
     return filtros;
   }
 }

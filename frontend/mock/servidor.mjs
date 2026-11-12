@@ -1310,6 +1310,150 @@ ruta('GET', '/api/medicamentos/exportar', 'LECTURA', ({ url }) => {
   });
 });
 
+const TEXTO_TIPO_MOVIMIENTO = {
+  INGRESO: 'Ingreso',
+  EGRESO: 'Egreso',
+  BAJA_VENCIMIENTO: 'Baja por vencimiento',
+  AJUSTE: 'Ajuste',
+};
+const TEXTO_ROL = { ADMIN: 'Administrador', FARMACEUTICO: 'Farmacéutico', CONSULTA: 'Consulta' };
+const siNo = (valor) => (valor ? 'Sí' : 'No');
+const textoActivo = (url) => {
+  const activo = url.searchParams.get('activo');
+  if (activo === null) return 'Incluye inactivos';
+  return activo === 'true' ? 'Solo activos' : 'Solo inactivos';
+};
+const fechaHoraCorta = (instante) =>
+  new Date(instante).toLocaleString('es-AR', {
+    timeZone: 'America/Argentina/Buenos_Aires',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  });
+const conBusqueda = (url, filtros) => {
+  const q = url.searchParams.get('q');
+  return q ? [`Búsqueda: ${q}`, ...filtros] : filtros;
+};
+
+ruta('GET', '/api/movimientos/exportar', 'LECTURA', ({ url }) => {
+  const medicamentoId = url.searchParams.get('medicamentoId');
+  const lista = movimientos
+    .filter((m) => !medicamentoId || buscar(lotes, m.loteId).medicamentoId === Number(medicamentoId))
+    .map(aMovimiento)
+    .sort((a, b) => b.fechaHora.localeCompare(a.fechaHora));
+  const filas = [
+    ['Fecha y hora', 'Tipo', 'Medicamento', 'Lote', 'Cantidad', 'Saldo', 'Usuario', 'Transferencia o motivo'],
+    ...lista.map((m) => [
+      fechaHoraCorta(m.fechaHora),
+      TEXTO_TIPO_MOVIMIENTO[m.tipo],
+      m.medicamento,
+      m.numeroLote,
+      m.cantidad,
+      m.saldoResultante,
+      m.usuario,
+      m.transferenciaId ? numeroTransferencia(m.transferenciaId) : (m.motivo ?? ''),
+    ]),
+  ];
+  const filtros = medicamentoId
+    ? [`Medicamento: ${nombreMedicamento(buscar(medicamentos, medicamentoId))}`]
+    : [];
+  return archivoReporte(url, 'movimientos_stock', 'Movimientos de stock', filas, {
+    numericas: [4, 5],
+    filtros,
+  });
+});
+
+ruta('GET', '/api/proveedores/exportar', 'LECTURA', ({ url }) => {
+  const q = url.searchParams.get('q') ?? '';
+  const lista = filtroActivo(proveedores, url)
+    .filter((p) => contiene(`${p.razonSocial} ${p.cuit}`, q))
+    .map(aProveedor)
+    .sort((a, b) => a.razonSocial.localeCompare(b.razonSocial));
+  const filas = [
+    ['Razón social', 'CUIT', 'Teléfono', 'Correo', 'Lotes con stock', 'Activo'],
+    ...lista.map((p) => [
+      p.razonSocial,
+      p.cuit,
+      p.telefono ?? '',
+      p.email ?? '',
+      p.lotesConStock,
+      siNo(p.activo),
+    ]),
+  ];
+  return archivoReporte(url, 'proveedores', 'Proveedores', filas, {
+    numericas: [4],
+    filtros: conBusqueda(url, [textoActivo(url)]),
+  });
+});
+
+ruta('GET', '/api/areas/exportar', 'LECTURA', ({ url }) => {
+  const q = url.searchParams.get('q') ?? '';
+  const lista = filtroActivo(areas, url)
+    .filter((a) => contiene(a.nombre, q))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  const filas = [['Área', 'Activa'], ...lista.map((a) => [a.nombre, siNo(a.activo)])];
+  return archivoReporte(url, 'areas', 'Áreas del hospital', filas, {
+    filtros: conBusqueda(url, [textoActivo(url)]),
+  });
+});
+
+ruta('GET', '/api/usuarios/exportar', 'USUARIO_GESTIONAR', ({ url }) => {
+  const q = url.searchParams.get('q') ?? '';
+  const lista = filtroActivo(usuarios, url)
+    .filter((u) => contiene(`${u.username} ${u.nombreCompleto}`, q))
+    .map(aUsuario)
+    .sort((a, b) => a.username.localeCompare(b.username));
+  const filas = [
+    ['Usuario', 'Nombre completo', 'Rol', 'Activo', 'Alta'],
+    ...lista.map((u) => [
+      u.username,
+      u.nombreCompleto,
+      TEXTO_ROL[u.rol],
+      siNo(u.activo),
+      fechaHoraCorta(u.creadoEn).slice(0, 10),
+    ]),
+  ];
+  return archivoReporte(url, 'usuarios', 'Usuarios del sistema', filas, {
+    filtros: conBusqueda(url, [textoActivo(url)]),
+  });
+});
+
+ruta('GET', '/api/alertas/exportar', 'LECTURA', ({ url }) => {
+  const alertas = calcularAlertas();
+  const lote = (alerta, l) => [
+    alerta,
+    l.medicamento,
+    l.numeroLote,
+    fechaCorta(l.fechaVencimiento),
+    l.diasParaVencer,
+    l.cantidadActual,
+    '',
+  ];
+  const medicamento = (alerta, m) => [
+    alerta,
+    `${m.nombre} ${m.presentacion}`,
+    '',
+    '',
+    '',
+    m.stockTotal,
+    m.stockMinimo,
+  ];
+  const filas = [
+    ['Alerta', 'Medicamento', 'Lote', 'Vencimiento', 'Días', 'Cantidad o stock', 'Stock mínimo'],
+    ...alertas.vencidos.map((l) => lote('Vencido', l)),
+    ...alertas.sinStock.map((m) => medicamento('Sin stock', m)),
+    ...alertas.porVencer.map((l) => lote('Por vencer', l)),
+    ...alertas.stockBajo.map((m) => medicamento('Stock bajo', m)),
+  ];
+  return archivoReporte(url, 'alertas', 'Alertas de stock y vencimientos', filas, {
+    numericas: [4, 5, 6],
+    filtros: [`Por vencer: dentro de los próximos ${alertas.diasPorVencer} días`],
+  });
+});
+
 ruta('GET', '/api/lotes/exportar', 'LECTURA', ({ url }) => {
   const estados = url.searchParams.getAll('estado');
   const medicamentoId = url.searchParams.get('medicamentoId');

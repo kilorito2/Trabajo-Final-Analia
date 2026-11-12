@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 import { CalendarClock, OctagonAlert, PackageX, TrendingDown, type LucideIcon } from 'lucide-react';
 import { useAlertas, useResumen } from '../../api/alertas';
 import type { AlertaLote, AlertaMedicamento, Resumen } from '../../api/tipos';
+import { exportarAlertas } from '../../api/reportes';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
 import { Cargando, ErrorCarga } from '../../components/Estados';
 import { Insignia } from '../../components/Insignia';
@@ -120,7 +122,10 @@ export function PaginaPanel() {
 
   return (
     <>
-      <EncabezadoPagina titulo="Panel" />
+      <EncabezadoPagina
+        titulo="Panel"
+        acciones={<BotonesExportar que="las alertas" exportar={exportarAlertas} />}
+      />
       {resumen.isPending && <Cargando />}
       {resumen.isError && <ErrorCarga error={resumen.error} alReintentar={() => resumen.refetch()} />}
       {resumen.data && (

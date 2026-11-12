@@ -18,7 +18,7 @@ Una idea por diapositiva, poco texto, la explicación la decís vos.
 | 7 | **FEFO**: ejemplo con dos lotes (100 que vence en diciembre, 200 que vence en marzo; piden 150 → 100 + 50). | "La persona no elige el lote: el sistema saca del que vence primero." | 1:00 |
 | 8 | **Concurrencia**: dos farmacéuticos piden 60 de un lote de 100 al mismo tiempo. | "Sin control, los dos leen 100 y el stock queda en −20. Uso un bloqueo en la base ordenado por id: uno pasa, el otro recibe 'stock insuficiente'. Lo demuestra una prueba que lanza dos hilos a la vez." | 1:15 |
 | 9 | **Seguridad**: BCrypt, JWT, 3 roles y 6 permisos, permisos leídos de la base en cada pedido. | "Si el admin desactiva a alguien, pierde el acceso en su próxima acción, aunque su token no haya vencido." | 1:00 |
-| 10 | **Calidad**: 94 pruebas en el backend (con PostgreSQL real en Docker), 97 en el frontend, accesibilidad automática. | "Cada cambio se verifica en segundos." | 0:45 |
+| 10 | **Calidad**: 100 pruebas en el backend (con PostgreSQL real en Docker), 99 en el frontend, accesibilidad automática. | "Cada cambio se verifica en segundos." | 0:45 |
 | 11 | **Mejora y presupuesto**: órdenes de compra; 444 h + 128 h a $25.000 = $14.300.000. | Explicar cómo se calculó el valor hora. | 0:45 |
 | 12 | **Conclusiones** y "¿Preguntas?" | Tres aprendizajes: proteger las reglas en varias capas, la concurrencia no es un caso raro, las fechas y zonas horarias. | 0:45 |
 

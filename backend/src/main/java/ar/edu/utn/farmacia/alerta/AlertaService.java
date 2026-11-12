@@ -1,6 +1,8 @@
 package ar.edu.utn.farmacia.alerta;
 
+import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.FarmaciaProperties;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import ar.edu.utn.farmacia.lote.Lote;
 import ar.edu.utn.farmacia.lote.LoteRepository;
 import ar.edu.utn.farmacia.medicamento.EstadoStock;
@@ -27,7 +29,13 @@ public class AlertaService {
   private final MedicamentoRepository medicamentoRepository;
   private final LoteRepository loteRepository;
   private final FarmaciaProperties propiedades;
+  private final Exportador exportador;
   private final Clock clock;
+
+  @Transactional(readOnly = true)
+  public byte[] exportar(FormatoReporte formato) {
+    return exportador.generar(AlertaReporte.generar(calcular()), formato);
+  }
 
   @Transactional(readOnly = true)
   public AlertasResponse calcular() {

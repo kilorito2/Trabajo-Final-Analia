@@ -3,6 +3,8 @@ import { Plus } from 'lucide-react';
 import { useMedicamentos } from '../../api/medicamentos';
 import type { EstadoStock, Medicamento } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
+import { exportarMedicamentos } from '../../api/reportes';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { CampoBusqueda } from '../../components/CampoBusqueda';
 import { CasillaInactivos, filtroActivo } from '../../components/CasillaInactivos';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
@@ -70,10 +72,9 @@ export function PaginaMedicamentos() {
   const { puede } = useSesion();
   const estado = leerEstado(filtros.leer('estado'));
 
+  const filtrosApi = { q: filtros.leer('q') || undefined, estado, activo: filtroActivo(filtros) };
   const consulta = useMedicamentos({
-    q: filtros.leer('q') || undefined,
-    estado,
-    activo: filtroActivo(filtros),
+    ...filtrosApi,
     page: filtros.pagina,
     sort: filtros.ordenApi,
   });
@@ -83,12 +84,18 @@ export function PaginaMedicamentos() {
       <EncabezadoPagina
         titulo="Medicamentos"
         acciones={
-          puede('CATALOGO_EDITAR') && (
-            <Link to="/medicamentos/nuevo" className="boton boton--primario">
-              <Plus size={16} aria-hidden="true" />
-              Nuevo medicamento
-            </Link>
-          )
+          <>
+            <BotonesExportar
+              que="el stock de medicamentos"
+              exportar={(formato) => exportarMedicamentos(filtrosApi, formato)}
+            />
+            {puede('CATALOGO_EDITAR') && (
+              <Link to="/medicamentos/nuevo" className="boton boton--primario">
+                <Plus size={16} aria-hidden="true" />
+                Nuevo medicamento
+              </Link>
+            )}
+          </>
         }
       />
       <div className="filtros">

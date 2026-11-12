@@ -35,6 +35,8 @@ describe('Reportes', () => {
             `stock_medicamentos.${url.searchParams.get('formato') === 'PDF' ? 'pdf' : 'csv'}`,
           ),
         'GET /api/lotes/exportar': () => archivo('application/pdf', 'lotes_vencimientos.pdf'),
+        'GET /api/alertas/exportar': () =>
+          archivo('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'alertas.xlsx'),
       },
     });
   }
@@ -71,6 +73,19 @@ describe('Reportes', () => {
     await waitFor(() => expect(clic).toHaveBeenCalledOnce());
     const [url] = api.mock.calls.find(([u]) => String(u).includes('/api/lotes/exportar')) ?? [];
     expect(String(url)).toBe('/api/lotes/exportar?estado=VENCIDO&estado=POR_VENCER&formato=PDF');
+  });
+
+  it('exporta las alertas en Excel', async () => {
+    const usuario = userEvent.setup();
+    const { api } = renderizar();
+
+    const tarjeta = (await screen.findByRole('heading', { name: 'Alertas' })).closest('section');
+    if (!tarjeta) throw new Error('No se encontró la tarjeta del reporte');
+    await usuario.click(within(tarjeta).getByRole('button', { name: 'Excel' }));
+
+    await waitFor(() => expect(clic).toHaveBeenCalledOnce());
+    const [url] = api.mock.calls.find(([u]) => String(u).includes('/api/alertas/exportar')) ?? [];
+    expect(String(url)).toBe('/api/alertas/exportar?formato=XLSX');
   });
 
   it('no deja exportar transferencias con un rango de fechas invertido', async () => {

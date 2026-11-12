@@ -34,8 +34,8 @@ simulada.
 El sistema se construyó con una arquitectura cliente-servidor: un **backend** en Java 21 con
 Spring Boot 4.1 que expone una API REST, una base de datos **PostgreSQL 16** normalizada hasta
 la tercera forma normal y versionada con Flyway, y un **frontend** en React 19 con TypeScript.
-Se verificó con 94 pruebas automatizadas en el backend (unitarias y de integración contra una base
-PostgreSQL real) y 97 en el frontend, además de pruebas de accesibilidad automáticas.
+Se verificó con 100 pruebas automatizadas en el backend (unitarias y de integración contra una base
+PostgreSQL real) y 99 en el frontend, además de pruebas de accesibilidad automáticas.
 
 **Palabras clave:** gestión de stock, farmacia hospitalaria, FEFO, trazabilidad por lote,
 Spring Boot, React, PostgreSQL, API REST, JWT.
@@ -328,7 +328,7 @@ El detalle completo está en la carpeta del proyecto
 | RF11 | Consultar el historial de movimientos de un medicamento. |
 | RF12 | Ver alertas de sin stock, stock bajo, por vencer y vencido. |
 | RF13 | Ver un panel con indicadores, alertas, últimas transferencias y consumo por área. |
-| RF14 | Generar reportes de stock, lotes y transferencias, en pantalla, Excel y PDF. |
+| RF14 | Generar reportes en pantalla, Excel y PDF: stock, lotes y vencimientos, transferencias, movimientos, alertas, proveedores, áreas y usuarios. |
 
 ### 7.3 Requisitos no funcionales principales
 
@@ -613,7 +613,7 @@ vencimientos relativos a hoy y transferencias de los últimos 30 días).
 | De punta a punta y accesibilidad | Playwright, axe-core | Recorre todas las pantallas, saca capturas y falla ante violaciones de accesibilidad graves. |
 | Análisis estático | Spotless, ESLint, TypeScript estricto, knip | Formato, errores comunes, tipos y código sin usar. |
 
-Total: **94 pruebas en el backend y 97 en el frontend**, todas en verde. La integración continua
+Total: **100 pruebas en el backend y 99 en el frontend**, todas en verde. La integración continua
 corre las del backend en cada cambio.
 
 ### 10.2 Cada problema del prototipo tiene su prueba
@@ -662,7 +662,7 @@ El sistema cumple todos los requisitos de la consigna:
 | Normalización 3FN | Justificada tabla por tabla. |
 | Arquitectura con separación de responsabilidades | Capas en el backend; `api/`, `hooks/`, `components/`, `pages/` en el frontend. |
 | Manejo de errores | Formato único RFC 9457 con código; mensajes en español. |
-| Reportes en pantalla y exportables | Pantalla **Reportes** con "Ver en pantalla", Excel y PDF; comprobante en PDF. |
+| Reportes en pantalla y exportables | Pantalla **Reportes** con "Ver en pantalla", Excel y PDF; botones Excel y PDF en cada listado (panel, medicamentos, movimientos, lotes, transferencias, proveedores, áreas y usuarios); comprobante en PDF. |
 | Mejora y presupuesto | Sección 12. |
 
 Tamaño aproximado: unas 5.800 líneas de Java y 6.300 de TypeScript en el código de producción, más

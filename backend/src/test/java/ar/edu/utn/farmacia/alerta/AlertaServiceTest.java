@@ -38,6 +38,7 @@ class AlertaServiceTest {
             medicamentoRepository,
             loteRepository,
             Entidades.propiedades(),
+            null,
             RelojFijoConfig.reloj());
   }
 

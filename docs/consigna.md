@@ -28,18 +28,20 @@ Cada requisito obligatorio, dónde está resuelto y cómo se verifica.
 | Arquitectura con separación de responsabilidades | Backend en capas por funcionalidad: Controller (sin lógica) → Service (`@Transactional`) → Repository → Entidad, con DTO `record`. Frontend: `api/` (único lugar que llama a `fetch`), `hooks/`, `components/` reutilizables y `pages/`. |
 | Código modular y reutilizable | Ejemplos: `Reporte` + `Exportador` generan CSV y PDF para todos los reportes; `Tabla`, `CampoFormulario`, `useFormulario` y `useDescarga` en el front. |
 | Manejo de errores y excepciones | `ManejadorErrores`: todo error sale como ProblemDetail con `codigo`; el 500 tiene `errorId` y no expone el stacktrace. El front muestra los errores debajo de cada campo o como aviso. |
-| Código ordenado y claro | Spotless + google-java-format en `verify`; ESLint, Prettier, TypeScript estricto y knip en el front. 94 tests en el backend y 97 en el front. |
+| Código ordenado y claro | Spotless + google-java-format en `verify`; ESLint, Prettier, TypeScript estricto y knip en el front. 100 tests en el backend y 99 en el front. |
 
 ## Reportes (excluyente)
 
 | Requisito | Dónde |
 |---|---|
 | Mostrar la información en pantalla | Panel con indicadores y alertas, listados de medicamentos, lotes y transferencias con filtros, y la pantalla **Reportes** con "Ver en pantalla". |
-| Exportar a PDF, Excel o CSV | Pantalla **Reportes**: stock de medicamentos, lotes y vencimientos, y transferencias, cada uno en **Excel (.xlsx)** y **PDF** (y CSV por la API). El historial de transferencias exporta en los dos formatos y cada comprobante se descarga en PDF con lugar para las firmas. |
+| Exportar a PDF, Excel o CSV | Pantalla **Reportes**: stock de medicamentos, lotes y vencimientos, transferencias y alertas, cada uno en **Excel (.xlsx)** y **PDF** (y CSV por la API). Además, botones **Excel** y **PDF** con los filtros aplicados en el Panel (alertas), Medicamentos, el detalle de cada medicamento (movimientos de stock), Lotes y vencimientos, Transferencias, Proveedores, Áreas y Usuarios. Cada comprobante se descarga en PDF con lugar para las firmas. |
 
 Endpoints: `GET /api/medicamentos/exportar`, `GET /api/lotes/exportar`,
-`GET /api/transferencias/exportar` (todos con `formato=CSV|XLSX|PDF`) y
-`GET /api/transferencias/{id}/pdf`. Tests: `ReportesIT`, `FlujoCompletoIT`, `PaginaReportes.test.tsx`.
+`GET /api/transferencias/exportar`, `GET /api/movimientos/exportar`, `GET /api/proveedores/exportar`,
+`GET /api/areas/exportar`, `GET /api/usuarios/exportar` y `GET /api/alertas/exportar` (todos con
+`formato=CSV|XLSX|PDF`) y `GET /api/transferencias/{id}/pdf`. Tests: `ReportesIT`, `ExportacionesIT`,
+`FlujoCompletoIT`, `PaginaReportes.test.tsx`, `BotonesExportar.test.tsx`.
 
 ## Mejora y presupuesto
 

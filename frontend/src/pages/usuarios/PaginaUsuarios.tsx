@@ -1,6 +1,7 @@
 import { useState, type SelectHTMLAttributes } from 'react';
 import { Plus } from 'lucide-react';
 import { mensajeDeError } from '../../api/errores';
+import { exportarUsuarios } from '../../api/reportes';
 import type { Rol, Usuario } from '../../api/tipos';
 import {
   useCambiarEstadoUsuario,
@@ -10,6 +11,7 @@ import {
   useUsuarios,
 } from '../../api/usuarios';
 import { useSesion } from '../../auth/SesionProvider';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { useAvisos } from '../../components/Avisos';
 import { CampoBusqueda } from '../../components/CampoBusqueda';
 import { CampoFormulario } from '../../components/CampoFormulario';
@@ -319,9 +321,9 @@ export function PaginaUsuarios() {
   const [accion, setAccion] = useState<Accion | null>(null);
   const cambiarEstado = useCambiarEstadoUsuario();
 
+  const filtrosApi = { q: filtros.leer('q') || undefined, activo: filtroActivo(filtros) };
   const consulta = useUsuarios({
-    q: filtros.leer('q') || undefined,
-    activo: filtroActivo(filtros),
+    ...filtrosApi,
     page: filtros.pagina,
     sort: filtros.ordenApi,
   });
@@ -398,10 +400,20 @@ export function PaginaUsuarios() {
       <EncabezadoPagina
         titulo="Usuarios"
         acciones={
-          <button type="button" className="boton boton--primario" onClick={() => setAccion({ tipo: 'alta' })}>
-            <Plus size={16} aria-hidden="true" />
-            Nuevo usuario
-          </button>
+          <>
+            <BotonesExportar
+              que="los usuarios"
+              exportar={(formato) => exportarUsuarios(filtrosApi, formato)}
+            />
+            <button
+              type="button"
+              className="boton boton--primario"
+              onClick={() => setAccion({ tipo: 'alta' })}
+            >
+              <Plus size={16} aria-hidden="true" />
+              Nuevo usuario
+            </button>
+          </>
         }
       />
       <div className="filtros">

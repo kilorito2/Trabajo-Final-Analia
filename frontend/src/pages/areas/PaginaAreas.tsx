@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useAreas, useCambiarEstadoArea, useGuardarArea } from '../../api/areas';
 import { mensajeDeError } from '../../api/errores';
+import { exportarAreas } from '../../api/reportes';
 import type { Area } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { useAvisos } from '../../components/Avisos';
 import { CampoBusqueda } from '../../components/CampoBusqueda';
 import { CampoFormulario } from '../../components/CampoFormulario';
@@ -95,9 +97,9 @@ export function PaginaAreas() {
   const [cambiandoEstado, setCambiandoEstado] = useState<Area | null>(null);
   const cambiarEstado = useCambiarEstadoArea();
 
+  const filtrosApi = { q: filtros.leer('q') || undefined, activo: filtroActivo(filtros) };
   const consulta = useAreas({
-    q: filtros.leer('q') || undefined,
-    activo: filtroActivo(filtros),
+    ...filtrosApi,
     page: filtros.pagina,
     sort: filtros.ordenApi,
   });
@@ -151,12 +153,15 @@ export function PaginaAreas() {
       <EncabezadoPagina
         titulo="Áreas"
         acciones={
-          puedeEditar && (
-            <button type="button" className="boton boton--primario" onClick={() => setEditando('nueva')}>
-              <Plus size={16} aria-hidden="true" />
-              Nueva área
-            </button>
-          )
+          <>
+            <BotonesExportar que="las áreas" exportar={(formato) => exportarAreas(filtrosApi, formato)} />
+            {puedeEditar && (
+              <button type="button" className="boton boton--primario" onClick={() => setEditando('nueva')}>
+                <Plus size={16} aria-hidden="true" />
+                Nueva área
+              </button>
+            )}
+          </>
         }
       />
       <div className="filtros">

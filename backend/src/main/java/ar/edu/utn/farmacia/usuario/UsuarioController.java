@@ -1,6 +1,8 @@
 package ar.edu.utn.farmacia.usuario;
 
 import ar.edu.utn.farmacia.common.EstadoRequest;
+import ar.edu.utn.farmacia.common.Exportador;
+import ar.edu.utn.farmacia.common.FormatoReporte;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,15 @@ public class UsuarioController {
       @PageableDefault(size = 20, sort = "username", direction = Sort.Direction.ASC)
           Pageable pagina) {
     return usuarioService.listar(q, activo, pagina);
+  }
+
+  /** Usuarios en Excel (XLSX), CSV o PDF, con los filtros del listado. Nunca incluye el hash. */
+  @GetMapping("/exportar")
+  public ResponseEntity<byte[]> exportar(
+      @RequestParam(required = false) String q,
+      @RequestParam(required = false) Boolean activo,
+      @RequestParam(defaultValue = "CSV") FormatoReporte formato) {
+    return Exportador.descarga(usuarioService.exportar(q, activo, formato), "usuarios", formato);
   }
 
   @PostMapping

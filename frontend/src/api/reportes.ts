@@ -21,7 +21,7 @@ export function exportarMedicamentos(
 }
 
 export function exportarLotes(
-  filtros: { medicamentoId?: number; estado?: EstadoLote[] },
+  filtros: { q?: string; medicamentoId?: number; estado?: EstadoLote[] },
   formato: FormatoReporte,
 ) {
   return exportar('/api/lotes/exportar', filtros, formato);
@@ -32,6 +32,28 @@ export function exportarTransferencias(
   formato: FormatoReporte,
 ) {
   return exportar('/api/transferencias/exportar', filtros, formato);
+}
+
+export function exportarMovimientos(filtros: { medicamentoId?: number }, formato: FormatoReporte) {
+  return exportar('/api/movimientos/exportar', filtros, formato);
+}
+
+type FiltrosListado = { q?: string; activo?: boolean };
+
+export function exportarProveedores(filtros: FiltrosListado, formato: FormatoReporte) {
+  return exportar('/api/proveedores/exportar', filtros, formato);
+}
+
+export function exportarAreas(filtros: FiltrosListado, formato: FormatoReporte) {
+  return exportar('/api/areas/exportar', filtros, formato);
+}
+
+export function exportarUsuarios(filtros: FiltrosListado, formato: FormatoReporte) {
+  return exportar('/api/usuarios/exportar', filtros, formato);
+}
+
+export function exportarAlertas(formato: FormatoReporte) {
+  return exportar('/api/alertas/exportar', {}, formato);
 }
 
 export function descargarComprobante(id: number) {

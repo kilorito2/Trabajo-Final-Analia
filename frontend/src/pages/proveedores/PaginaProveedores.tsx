@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { mensajeDeError } from '../../api/errores';
+import { exportarProveedores } from '../../api/reportes';
 import { useCambiarEstadoProveedor, useGuardarProveedor, useProveedores } from '../../api/proveedores';
 import type { Proveedor } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
+import { BotonesExportar } from '../../components/BotonesExportar';
 import { useAvisos } from '../../components/Avisos';
 import { CampoBusqueda } from '../../components/CampoBusqueda';
 import { CampoFormulario } from '../../components/CampoFormulario';
@@ -142,9 +144,9 @@ export function PaginaProveedores() {
   const [cambiandoEstado, setCambiandoEstado] = useState<Proveedor | null>(null);
   const cambiarEstado = useCambiarEstadoProveedor();
 
+  const filtrosApi = { q: filtros.leer('q') || undefined, activo: filtroActivo(filtros) };
   const consulta = useProveedores({
-    q: filtros.leer('q') || undefined,
-    activo: filtroActivo(filtros),
+    ...filtrosApi,
     page: filtros.pagina,
     sort: filtros.ordenApi,
   });
@@ -217,12 +219,18 @@ export function PaginaProveedores() {
       <EncabezadoPagina
         titulo="Proveedores"
         acciones={
-          puedeEditar && (
-            <button type="button" className="boton boton--primario" onClick={() => setEditando('nuevo')}>
-              <Plus size={16} aria-hidden="true" />
-              Nuevo proveedor
-            </button>
-          )
+          <>
+            <BotonesExportar
+              que="los proveedores"
+              exportar={(formato) => exportarProveedores(filtrosApi, formato)}
+            />
+            {puedeEditar && (
+              <button type="button" className="boton boton--primario" onClick={() => setEditando('nuevo')}>
+                <Plus size={16} aria-hidden="true" />
+                Nuevo proveedor
+              </button>
+            )}
+          </>
         }
       />
       <div className="filtros">
