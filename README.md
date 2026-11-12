@@ -83,3 +83,6 @@ Antes de commitear: `./mvnw spotless:apply`.
 - Modelo de datos (diagrama entidad-relación y 3FN): `docs/modelo-datos.md`
 - Cumplimiento de la consigna del TFI: `docs/consigna.md`
 - Mejora propuesta y presupuesto: `docs/presupuesto.md`
+
+Documentación para la entrega del TFI (informe final, carpeta del proyecto, manual de usuario,
+guion de la defensa y carpeta de estudio): [`documentos/`](documentos/README.md).
