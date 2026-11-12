@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 type TipoAviso = 'exito' | 'error' | 'advertencia' | 'info';
 
-type Aviso = { id: number; tipo: TipoAviso; mensaje: string };
+type Aviso = { id: number; tipo: TipoAviso; mensaje: string; saliendo?: boolean };
 
 type OpcionesAviso = {
   /** Si es true, el aviso queda hasta que se cierra a mano. Los errores siempre quedan. */
@@ -16,6 +16,8 @@ type ContextoAvisos = {
 };
 
 const DURACION_EXITO_MS = 5_000;
+/** Lo que dura la transición de salida en animaciones.css (--duracion-larga). */
+const DURACION_SALIDA_MS = 280;
 
 const Contexto = createContext<ContextoAvisos | null>(null);
 
@@ -23,8 +25,14 @@ export function AvisosProvider({ children }: { children: ReactNode }) {
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const siguienteId = useRef(1);
 
+  // Primero se marca para que salga animado y recién después se quita.
   const cerrar = useCallback((id: number) => {
-    setAvisos((actuales) => actuales.filter((aviso) => aviso.id !== id));
+    setAvisos((actuales) =>
+      actuales.map((aviso) => (aviso.id === id ? { ...aviso, saliendo: true } : aviso)),
+    );
+    setTimeout(() => {
+      setAvisos((actuales) => actuales.filter((aviso) => aviso.id !== id));
+    }, DURACION_SALIDA_MS);
   }, []);
 
   const avisar = useCallback(
@@ -49,7 +57,7 @@ export function AvisosProvider({ children }: { children: ReactNode }) {
         {avisos.map((aviso) => (
           <div
             key={aviso.id}
-            className={`aviso aviso--${aviso.tipo}`}
+            className={`aviso aviso--${aviso.tipo}${aviso.saliendo ? ' aviso--saliendo' : ''}`}
             role={aviso.tipo === 'error' || aviso.tipo === 'advertencia' ? 'alert' : 'status'}
           >
             <p>{aviso.mensaje}</p>

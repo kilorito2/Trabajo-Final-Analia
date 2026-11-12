@@ -61,10 +61,19 @@
   --alto-fila: 44px;
   --alto-barra: 56px;
   --transicion: 150ms ease;
+
+  /* Movimiento: curvas fuertes porque las de CSS (ease-out) arrancan demasiado tímidas. */
+  --curva-salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --curva-cajon: cubic-bezier(0.32, 0.72, 0, 1);
+  --duracion-corta: 120ms;
+  --duracion: 200ms;
+  --duracion-larga: 280ms;
+  /* Multiplica cada desplazamiento y escala; en 0 las animaciones quedan solo como fundidos. */
+  --movimiento: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --transicion: 0ms;
+    --movimiento: 0;
   }
 }

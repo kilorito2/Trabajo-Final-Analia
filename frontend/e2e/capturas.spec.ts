@@ -10,6 +10,17 @@ const CARPETA = '../docs/capturas';
 async function capturar(page: Page, nombre: string) {
   await page.waitForLoadState('networkidle');
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+  await expect(page.locator('.estado-cargando')).toHaveCount(0);
+  // Axe mediría el contraste a mitad de un fundido de entrada. Las infinitas (esqueletos) no terminan.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animacion) => animacion.effect?.getTiming().iterations !== Infinity)
+        // Si el elemento se desmonta, la animación se cancela y su promesa se rechaza.
+        .map((animacion) => animacion.finished.catch(() => undefined)),
+    ),
+  );
   const resultado = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();

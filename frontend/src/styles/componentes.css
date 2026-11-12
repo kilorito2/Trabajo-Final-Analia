@@ -348,7 +348,12 @@
   transition:
     background-color var(--transicion),
     border-color var(--transicion),
-    box-shadow var(--transicion);
+    box-shadow var(--transicion),
+    transform var(--duracion-corta) var(--curva-salida);
+}
+
+.boton:active:not(:disabled) {
+  transform: scale(calc(1 - 0.03 * var(--movimiento)));
 }
 
 .boton:hover {
@@ -886,6 +891,14 @@ textarea.control {
   background: transparent;
   color: var(--color-texto-suave);
   cursor: pointer;
+  transition:
+    background-color var(--transicion),
+    color var(--transicion),
+    transform var(--duracion-corta) var(--curva-salida);
+}
+
+.boton-icono:active:not(:disabled) {
+  transform: scale(calc(1 - 0.06 * var(--movimiento)));
 }
 
 .boton-icono:hover {
@@ -1108,12 +1121,18 @@ textarea.control {
   transition:
     border-color var(--transicion),
     box-shadow var(--transicion),
-    transform var(--transicion);
+    transform var(--duracion) var(--curva-salida);
 }
 
 .indicador:hover {
   box-shadow: var(--sombra);
-  transform: translateY(-1px);
+}
+
+/* Las pantallas táctiles disparan :hover al tocar; el levantamiento queda para el mouse. */
+@media (hover: hover) and (pointer: fine) {
+  .indicador:hover {
+    transform: translateY(calc(-2px * var(--movimiento)));
+  }
 }
 
 .indicador__icono {

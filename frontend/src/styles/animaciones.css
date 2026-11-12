@@ -1,0 +1,156 @@
+/* Entradas y salidas de la interfaz. Solo transform y opacity (no recalculan el diseño),
+   duraciones bajo 300 ms y nada en lo que se usa con teclado a cada rato (buscador, filtros).
+   Con "reducir movimiento", --movimiento vale 0 y todo queda como un fundido corto.
+   Las respuestas al presionar y al pasar el mouse están junto a cada componente. */
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(calc(8px * var(--movimiento)));
+  }
+}
+
+/* backwards y no both: al terminar no queda un transform aplicado, que crearía un contexto
+   de apilamiento nuevo para todo lo que está adentro. */
+
+/* ---------- Cambio de pantalla ---------- */
+
+/* Cada página monta un elemento nuevo dentro de main, así que la animación corre al navegar.
+   Los modales quedan afuera: tienen su propia entrada y esta se repetiría al abrirlos. */
+.contenido > :not(dialog),
+.ingreso__tarjeta {
+  animation: entrar var(--duracion-larga) var(--curva-salida) backwards;
+}
+
+/* ---------- Panel ---------- */
+
+.indicadores > li {
+  animation: entrar var(--duracion-larga) var(--curva-salida) backwards;
+}
+
+.indicadores > li:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.indicadores > li:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.indicadores > li:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+/* Las barras de egresos crecen desde la izquierda: así se leen como proporciones. */
+@keyframes crecer {
+  from {
+    transform: scaleX(calc(1 - var(--movimiento)));
+  }
+}
+
+.barra {
+  transform-origin: left center;
+  animation: crecer 480ms var(--curva-salida) backwards;
+}
+
+/* ---------- Carga ---------- */
+
+@keyframes latir {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.tabla__esqueleto {
+  animation: latir 1.4s ease-in-out infinite;
+}
+
+/* ---------- Modal ---------- */
+
+/* No está anclado a un botón, así que crece desde el centro. */
+.modal[open] {
+  transition:
+    opacity var(--duracion) var(--curva-salida),
+    transform var(--duracion) var(--curva-salida);
+}
+
+.modal[open]::backdrop {
+  transition: opacity var(--duracion) ease;
+}
+
+@starting-style {
+  .modal[open] {
+    opacity: 0;
+    transform: scale(calc(1 - 0.04 * var(--movimiento)));
+  }
+
+  .modal[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* ---------- Avisos (toasts) ---------- */
+
+/* Transición y no keyframes: si se cierran o llegan varios seguidos, cada uno retoma desde
+   donde está en lugar de reiniciar. */
+.aviso {
+  transition:
+    opacity var(--duracion) var(--curva-salida),
+    transform var(--duracion-larga) var(--curva-salida);
+}
+
+@starting-style {
+  .aviso {
+    opacity: 0;
+    transform: translateY(calc(100% * var(--movimiento)));
+  }
+}
+
+.aviso--saliendo {
+  opacity: 0;
+  transform: translateX(calc(100% * var(--movimiento)));
+  pointer-events: none;
+}
+
+/* ---------- Mensajes de error y validación ---------- */
+
+.mensaje,
+.campo__error {
+  transition:
+    opacity var(--duracion) var(--curva-salida),
+    transform var(--duracion) var(--curva-salida);
+}
+
+@starting-style {
+  .mensaje,
+  .campo__error {
+    opacity: 0;
+    transform: translateY(calc(-4px * var(--movimiento)));
+  }
+}
+
+/* ---------- Menú lateral en pantallas angostas ---------- */
+
+@media (max-width: 1099px) {
+  /* allow-discrete demora el display: none hasta que termina de salir. */
+  .menu {
+    transition:
+      transform var(--duracion-larga) var(--curva-cajon),
+      display var(--duracion-larga) allow-discrete;
+  }
+
+  .menu:not(.menu--abierto) {
+    transform: translateX(-100%);
+  }
+
+  @starting-style {
+    .menu--abierto {
+      transform: translateX(-100%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    transition: none;
+  }
+}

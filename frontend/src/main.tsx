@@ -5,6 +5,7 @@ import '@fontsource/ibm-plex-sans/latin-600.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/componentes.css';
+import './styles/animaciones.css';
 import './styles/impresion.css';
 import { App } from './App';
 
