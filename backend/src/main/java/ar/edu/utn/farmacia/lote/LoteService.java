@@ -14,6 +14,7 @@ import ar.edu.utn.farmacia.proveedor.Proveedor;
 import ar.edu.utn.farmacia.proveedor.ProveedorRepository;
 import ar.edu.utn.farmacia.usuario.Usuario;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.Clock;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -96,32 +98,38 @@ public class LoteService {
   }
 
   @Transactional(readOnly = true)
-  public Page<LoteResponse> listar(Long medicamentoId, Set<EstadoLote> estados, Pageable pagina) {
+  public Page<LoteResponse> listar(
+      String q, Long medicamentoId, Set<EstadoLote> estados, Pageable pagina) {
     Ordenamiento.validar(pagina.getSort(), ORDEN_PERMITIDO);
     LocalDate hoy = LocalDate.now(clock);
     return loteRepository
-        .findAll(filtro(medicamentoId, estados, hoy), pagina)
+        .findAll(filtro(q, medicamentoId, estados, hoy), pagina)
         .map(lote -> respuesta(lote, hoy));
   }
 
   /** Reporte de lotes con los mismos filtros que el listado, ordenado por vencimiento. */
   @Transactional(readOnly = true)
-  public byte[] exportar(Long medicamentoId, Set<EstadoLote> estados, FormatoReporte formato) {
+  public byte[] exportar(
+      String q, Long medicamentoId, Set<EstadoLote> estados, FormatoReporte formato) {
     LocalDate hoy = LocalDate.now(clock);
     List<LoteResponse> lotes =
         loteRepository
             .findAll(
-                filtro(medicamentoId, estados, hoy),
+                filtro(q, medicamentoId, estados, hoy),
                 Sort.by("fechaVencimiento", "fechaIngreso", "id"))
             .stream()
             .map(lote -> respuesta(lote, hoy))
             .toList();
-    return exportador.generar(LoteReporte.generar(lotes, estados), formato);
+    return exportador.generar(LoteReporte.generar(lotes, q, estados), formato);
   }
 
-  private Specification<Lote> filtro(Long medicamentoId, Set<EstadoLote> estados, LocalDate hoy) {
+  private Specification<Lote> filtro(
+      String q, Long medicamentoId, Set<EstadoLote> estados, LocalDate hoy) {
     LocalDate limite = hoy.plusDays(propiedades.alertas().diasPorVencer());
     List<Specification<Lote>> filtros = new ArrayList<>();
+    if (q != null && !q.isBlank()) {
+      filtros.add(busqueda(q));
+    }
     if (medicamentoId != null) {
       filtros.add(
           (raiz, consulta, cb) -> cb.equal(raiz.get("medicamento").get("id"), medicamentoId));
@@ -135,6 +143,21 @@ public class LoteService {
                       .toArray(Predicate[]::new)));
     }
     return Specification.allOf(filtros);
+  }
+
+  /** Busca el texto en el código, nombre o presentación del medicamento, el lote y el proveedor. */
+  private static Specification<Lote> busqueda(String q) {
+    String patron = "%" + q.strip().toLowerCase(Locale.ROOT) + "%";
+    return (raiz, consulta, cb) -> {
+      Join<Lote, Medicamento> medicamento = raiz.join("medicamento");
+      Join<Lote, Proveedor> proveedor = raiz.join("proveedor");
+      return cb.or(
+          cb.like(cb.lower(medicamento.get("codigo")), patron),
+          cb.like(cb.lower(medicamento.get("nombre")), patron),
+          cb.like(cb.lower(medicamento.get("presentacion")), patron),
+          cb.like(cb.lower(raiz.get("numeroLote")), patron),
+          cb.like(cb.lower(proveedor.get("razonSocial")), patron));
+    };
   }
 
   @Transactional

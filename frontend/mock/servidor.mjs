@@ -973,10 +973,17 @@ ruta('POST', '/api/medicamentos/{id}/lotes', 'STOCK_INGRESAR', ({ id, cuerpo, us
 ruta('GET', '/api/lotes', 'LECTURA', ({ url }) => {
   const medicamentoId = url.searchParams.get('medicamentoId');
   const estados = url.searchParams.getAll('estado');
+  const q = (url.searchParams.get('q') ?? '').trim().toLowerCase();
+  const coincide = (l) =>
+    !q ||
+    [l.medicamento, l.numeroLote, l.proveedor, buscar(medicamentos, l.medicamentoId)?.codigo ?? ''].some(
+      (v) => v.toLowerCase().includes(q),
+    );
   const lista = lotes
     .filter((l) => !medicamentoId || l.medicamentoId === Number(medicamentoId))
     .map(aLote)
-    .filter((l) => estados.length === 0 || estados.includes(l.estado));
+    .filter((l) => estados.length === 0 || estados.includes(l.estado))
+    .filter(coincide);
   return {
     cuerpo: paginar(
       lista,

@@ -35,20 +35,22 @@ public class LoteController {
   @GetMapping("/api/lotes")
   @PreAuthorize("hasAuthority('LECTURA')")
   public Page<LoteResponse> listar(
+      @RequestParam(required = false) String q,
       @RequestParam(required = false) Long medicamentoId,
       @RequestParam(required = false) Set<EstadoLote> estado,
       @PageableDefault(size = 20, sort = "fechaVencimiento") Pageable pagina) {
-    return loteService.listar(medicamentoId, estado, pagina);
+    return loteService.listar(q, medicamentoId, estado, pagina);
   }
 
   /** Reporte de lotes y vencimientos en Excel (XLSX), CSV o PDF. */
   @GetMapping("/api/lotes/exportar")
   @PreAuthorize("hasAuthority('LECTURA')")
   public ResponseEntity<byte[]> exportar(
+      @RequestParam(required = false) String q,
       @RequestParam(required = false) Long medicamentoId,
       @RequestParam(required = false) Set<EstadoLote> estado,
       @RequestParam(defaultValue = "CSV") FormatoReporte formato) {
-    byte[] contenido = loteService.exportar(medicamentoId, estado, formato);
+    byte[] contenido = loteService.exportar(q, medicamentoId, estado, formato);
     return Exportador.descarga(contenido, "lotes_vencimientos", formato);
   }
 

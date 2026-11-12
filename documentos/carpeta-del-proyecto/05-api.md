@@ -72,7 +72,7 @@ Permiso: el que exige cada ruta (ver la matriz en [06-seguridad.md](06-seguridad
 | Método y ruta | Permiso | Entrada | Respuesta |
 |---|---|---|---|
 | `POST /api/medicamentos/{id}/lotes` | STOCK_INGRESAR | `{proveedorId, numeroLote, fechaVencimiento, cantidad}` | 201 `{lote, stockTotalResultante}` |
-| `GET /api/lotes` | LECTURA | `medicamentoId`, `estado` (uno o varios: `VIGENTE`, `POR_VENCER`, `VENCIDO`, `AGOTADO`); orden: `fechaVencimiento`, `fechaIngreso` | Página con `estado` y `diasParaVencer` |
+| `GET /api/lotes` | LECTURA | `q` (medicamento, número de lote o proveedor), `medicamentoId`, `estado` (uno o varios: `VIGENTE`, `POR_VENCER`, `VENCIDO`, `AGOTADO`); orden: `fechaVencimiento`, `fechaIngreso` | Página con `estado` y `diasParaVencer` |
 | `GET /api/lotes/exportar` | LECTURA | mismos filtros + `formato` | Archivo `lotes_vencimientos.*` |
 | `POST /api/lotes/{id}/baja` | STOCK_BAJA_AJUSTE | `{motivo}` | 200 lote |
 | `POST /api/lotes/{id}/ajuste` | STOCK_BAJA_AJUSTE | `{cantidadNueva, motivo}` | 200 lote |

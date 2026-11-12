@@ -4,6 +4,7 @@ import { useAjustarLote, useDarDeBajaLote, useLotes } from '../../api/lotes';
 import type { EstadoLote, Lote } from '../../api/tipos';
 import { useSesion } from '../../auth/SesionProvider';
 import { useAvisos } from '../../components/Avisos';
+import { CampoBusqueda } from '../../components/CampoBusqueda';
 import { CampoFormulario } from '../../components/CampoFormulario';
 import { EncabezadoPagina } from '../../components/EncabezadoPagina';
 import { Insignia } from '../../components/Insignia';
@@ -226,7 +227,9 @@ export function PaginaLotes() {
   const [dandoDeBaja, setDandoDeBaja] = useState<Lote | null>(null);
   const [ajustando, setAjustando] = useState<Lote | null>(null);
 
+  const busqueda = filtros.leer('q');
   const consulta = useLotes({
+    q: busqueda || undefined,
     estado: VISTAS[vista].estados,
     page: filtros.pagina,
     sort: filtros.ordenApi ?? 'fechaVencimiento,asc',
@@ -295,6 +298,7 @@ export function PaginaLotes() {
     <>
       <EncabezadoPagina titulo="Lotes y vencimientos" />
       <div className="filtros">
+        <CampoBusqueda etiqueta="Buscar por medicamento, lote o proveedor" />
         <div className="campo">
           <label className="campo__etiqueta" htmlFor="filtro-vista">
             Mostrar
@@ -321,7 +325,7 @@ export function PaginaLotes() {
         cargando={consulta.isPending}
         error={consulta.error}
         alReintentar={() => consulta.refetch()}
-        vacio={vacios[vista]}
+        vacio={busqueda ? `No hay lotes que coincidan con «${busqueda}».` : vacios[vista]}
         orden={filtros.orden ?? { campo: 'fechaVencimiento', direccion: 'asc' }}
         alOrdenar={filtros.ordenar}
       />

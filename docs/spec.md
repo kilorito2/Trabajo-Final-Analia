@@ -61,8 +61,8 @@ del backend a criterios de aceptación verificables por endpoint. No agrega requ
 | Endpoint | Criterios de aceptación |
 |---|---|
 | `POST /api/medicamentos/{id}/lotes` (`STOCK_INGRESAR`) | Medicamento y proveedor activos (409 `MEDICAMENTO_INACTIVO` / `PROVEEDOR_INACTIVO`). `fechaVencimiento >= hoy` (400 `VALIDACION` con `errors.fechaVencimiento`). `cantidad > 0`. Número de lote repetido para ese medicamento: 409 `LOTE_DUPLICADO`. Genera un movimiento `INGRESO`. 201 con `{lote, stockTotalResultante}`. |
-| `GET /api/lotes` (`LECTURA`) | Filtros `medicamentoId` y `estado` (uno o varios: `VIGENTE`, `POR_VENCER`, `VENCIDO`, `AGOTADO`). Orden: `fechaVencimiento`, `fechaIngreso`. |
-| `GET /api/lotes/exportar` (`LECTURA`) | Filtros `medicamentoId` y `estado` del listado, sin paginar, ordenado por vencimiento. `formato=CSV`, `XLSX` o `PDF`. Archivo `lotes_vencimientos.csv` / `.xlsx` / `.pdf`. |
+| `GET /api/lotes` (`LECTURA`) | Filtros `q` (código, nombre o presentación del medicamento, número de lote o razón social del proveedor, sin distinguir mayúsculas), `medicamentoId` y `estado` (uno o varios: `VIGENTE`, `POR_VENCER`, `VENCIDO`, `AGOTADO`). Orden: `fechaVencimiento`, `fechaIngreso`. |
+| `GET /api/lotes/exportar` (`LECTURA`) | Filtros `q`, `medicamentoId` y `estado` del listado, sin paginar, ordenado por vencimiento. `formato=CSV`, `XLSX` o `PDF`. Archivo `lotes_vencimientos.csv` / `.xlsx` / `.pdf`. |
 | `POST /api/lotes/{id}/baja` (`STOCK_BAJA_AJUSTE`) | Solo lotes vencidos con stock: si no venció, 409 `LOTE_NO_VENCIDO`; si está en 0, 409 `LOTE_SIN_STOCK`. Deja el lote en 0 y registra `BAJA_VENCIMIENTO` con el motivo (5 a 200 caracteres). |
 | `POST /api/lotes/{id}/ajuste` (`STOCK_BAJA_AJUSTE`) | `0 <= cantidadNueva <= cantidadInicial` y distinta de la actual (400 `VALIDACION`). Motivo de 5 a 200 caracteres. Registra `AJUSTE` con la diferencia. Usa bloqueo pesimista. |
 | `GET /api/movimientos` (`LECTURA`) | Filtros `loteId`, `medicamentoId`, `tipo`, `desde`, `hasta`. Orden: `fechaHora` (desc por defecto). La suma de `cantidad` de un lote es igual a su `cantidadActual`. |

@@ -11,6 +11,8 @@ import type {
 } from './tipos';
 
 type FiltrosLotes = {
+  /** Código, nombre o presentación del medicamento, número de lote o proveedor. */
+  q?: string;
   medicamentoId?: number;
   estado?: readonly EstadoLote[];
   page?: number;

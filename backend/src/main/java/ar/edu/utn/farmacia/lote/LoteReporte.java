@@ -3,6 +3,7 @@ package ar.edu.utn.farmacia.lote;
 import ar.edu.utn.farmacia.common.Exportador;
 import ar.edu.utn.farmacia.common.Reporte;
 import ar.edu.utn.farmacia.common.Reporte.Columna;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +25,7 @@ final class LoteReporte {
 
   private LoteReporte() {}
 
-  static Reporte generar(List<LoteResponse> lotes, Set<EstadoLote> estados) {
+  static Reporte generar(List<LoteResponse> lotes, String q, Set<EstadoLote> estados) {
     List<List<String>> filas =
         lotes.stream()
             .map(
@@ -40,7 +41,7 @@ final class LoteReporte {
                         lote.fechaIngreso().format(Exportador.FECHA),
                         texto(lote.estado())))
             .toList();
-    return new Reporte("Lotes y vencimientos", filtros(estados), COLUMNAS, filas);
+    return new Reporte("Lotes y vencimientos", filtros(q, estados), COLUMNAS, filas);
   }
 
   static String texto(EstadoLote estado) {
@@ -52,16 +53,23 @@ final class LoteReporte {
     };
   }
 
-  private static List<String> filtros(Set<EstadoLote> estados) {
+  private static List<String> filtros(String q, Set<EstadoLote> estados) {
+    List<String> filtros = new ArrayList<>();
+    if (q != null && !q.isBlank()) {
+      filtros.add("Búsqueda: " + q.strip());
+    }
+    filtros.add("Estado: " + estados(estados));
+    return filtros;
+  }
+
+  private static String estados(Set<EstadoLote> estados) {
     if (estados == null || estados.isEmpty()) {
-      return List.of("Estado: todos");
+      return "todos";
     }
     // El orden del enum, no el del pedido, para que el texto sea siempre el mismo.
-    String elegidos =
-        Arrays.stream(EstadoLote.values())
-            .filter(estados::contains)
-            .map(LoteReporte::texto)
-            .collect(Collectors.joining(", "));
-    return List.of("Estado: " + elegidos);
+    return Arrays.stream(EstadoLote.values())
+        .filter(estados::contains)
+        .map(LoteReporte::texto)
+        .collect(Collectors.joining(", "));
   }
 }
