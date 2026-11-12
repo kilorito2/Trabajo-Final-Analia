@@ -35,7 +35,7 @@ El sistema se construyó con una arquitectura cliente-servidor: un **backend** e
 Spring Boot 4.1 que expone una API REST, una base de datos **PostgreSQL 16** normalizada hasta
 la tercera forma normal y versionada con Flyway, y un **frontend** en React 19 con TypeScript.
 Se verificó con 100 pruebas automatizadas en el backend (unitarias y de integración contra una base
-PostgreSQL real) y 99 en el frontend, además de pruebas de accesibilidad automáticas.
+PostgreSQL real) y 101 en el frontend, además de pruebas de accesibilidad automáticas.
 
 **Palabras clave:** gestión de stock, farmacia hospitalaria, FEFO, trazabilidad por lote,
 Spring Boot, React, PostgreSQL, API REST, JWT.
@@ -613,7 +613,7 @@ vencimientos relativos a hoy y transferencias de los últimos 30 días).
 | De punta a punta y accesibilidad | Playwright, axe-core | Recorre todas las pantallas, saca capturas y falla ante violaciones de accesibilidad graves. |
 | Análisis estático | Spotless, ESLint, TypeScript estricto, knip | Formato, errores comunes, tipos y código sin usar. |
 
-Total: **100 pruebas en el backend y 99 en el frontend**, todas en verde. La integración continua
+Total: **100 pruebas en el backend y 101 en el frontend**, todas en verde. La integración continua
 corre las del backend en cada cambio.
 
 ### 10.2 Cada problema del prototipo tiene su prueba

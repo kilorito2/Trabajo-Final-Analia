@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { describe, expect, it } from 'vitest';
 import { api } from '../api/cliente';
 import { Layout } from '../components/Layout';
-import { json, renderizarRuta } from '../test/renderizar';
+import { json, renderizarRuta, usuarioDePrueba } from '../test/renderizar';
 import { formatearHora } from '../utils/fechas';
 import { leerToken } from './almacenSesion';
 import { RutaProtegida } from './RutaProtegida';
@@ -68,6 +68,39 @@ describe('SesionProvider', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/ingresar'));
     expect(router.state.location.search).toBe('?motivo=expirada');
     expect(router.state.location.state).toEqual({ desde: expect.any(String) });
+    expect(leerToken()).toBeNull();
+  });
+
+  it('si no se puede validar la sesión por un error de red, no la borra y deja reintentar', async () => {
+    const usuario = userEvent.setup();
+    let fallar = true;
+    const { router } = renderizarRuta({
+      ruta: '/panel',
+      rutas,
+      respuestas: {
+        'GET /api/auth/me': () =>
+          fallar ? Promise.reject(new TypeError('Failed to fetch')) : json(200, usuarioDePrueba()),
+        'GET /api/resumen': () => json(200, {}),
+      },
+    });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo conectar con el servidor.');
+    expect(leerToken()).toBe('token-de-prueba');
+    expect(router.state.location.pathname).toBe('/panel');
+
+    fallar = false;
+    await usuario.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(await screen.findByRole('heading', { name: 'Datos' })).toBeVisible();
+  });
+
+  it('si la sesión guardada ya no vale (401), la borra y lleva al ingreso', async () => {
+    const { router } = renderizarRuta({
+      ruta: '/panel',
+      rutas,
+      respuestas: { 'GET /api/auth/me': () => json(401, { status: 401, codigo: 'NO_AUTENTICADO' }) },
+    });
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/ingresar'));
     expect(leerToken()).toBeNull();
   });
 });

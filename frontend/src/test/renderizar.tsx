@@ -69,7 +69,8 @@ export function renderizarRuta({
   if (usuario) {
     guardarSesion({ token: 'token-de-prueba', expiraEn });
   }
-  const api = simularApi({ ...respuestas, 'GET /api/auth/me': () => json(200, usuario) });
+  // Un test puede reemplazar /api/auth/me para simular que la validación de la sesión falla.
+  const api = simularApi({ 'GET /api/auth/me': () => json(200, usuario), ...respuestas });
   const router = createMemoryRouter(
     [
       {

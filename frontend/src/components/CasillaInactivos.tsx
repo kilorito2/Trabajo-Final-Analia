@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useFiltrosUrl } from '../hooks/useFiltrosUrl';
 
 /**
@@ -6,13 +7,25 @@ import { useFiltrosUrl } from '../hooks/useFiltrosUrl';
  */
 export function CasillaInactivos({ texto = 'Incluir inactivos' }: { texto?: string }) {
   const filtros = useFiltrosUrl();
-  const incluir = filtros.leer('inactivos') === 'si';
+  const enUrl = filtros.leer('inactivos') === 'si';
+  // React Router cambia la URL en una transición: si la casilla leyera solo la URL, tardaría en
+  // marcarse mientras se recarga la lista. Responde al instante y se resincroniza si la URL cambia
+  // por otra causa (Atrás, un enlace).
+  const [incluir, setIncluir] = useState(enUrl);
+  const [ultimaUrl, setUltimaUrl] = useState(enUrl);
+  if (ultimaUrl !== enUrl) {
+    setUltimaUrl(enUrl);
+    setIncluir(enUrl);
+  }
   return (
     <label className="casilla">
       <input
         type="checkbox"
         checked={incluir}
-        onChange={(e) => filtros.actualizar({ inactivos: e.target.checked ? 'si' : null })}
+        onChange={(e) => {
+          setIncluir(e.target.checked);
+          filtros.actualizar({ inactivos: e.target.checked ? 'si' : null });
+        }}
       />
       {texto}
     </label>

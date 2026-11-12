@@ -21,8 +21,9 @@ Pirámide de pruebas: muchas pruebas chicas y rápidas abajo, pocas grandes arri
 | Nivel | Cantidad | Cómo se corre | Tiempo aprox. |
 |---|---|---|---|
 | Backend (unitarias `*Test` + integración `*IT`) | 100 | `cd backend && ./mvnw verify` (necesita Docker) | 1–3 min |
-| Frontend (Vitest) | 99 | `cd frontend && npm test` | 15 s |
+| Frontend (Vitest) | 101 | `cd frontend && npm test` | 15 s |
 | Punta a punta + axe | 1 recorrido, 16 pantallas | `cd frontend && npm run capturas` (con la app levantada) | 25 s |
+| Recorrido de ABM punta a punta | 9 escenarios | `cd frontend && npm run e2e:recorrido` (con la app levantada; modifica datos demo) | 45 s |
 
 **Reloj fijo:** en las pruebas del backend, "hoy" es una fecha fija (bean `Clock` `@Primary`), así
 los casos de vencimiento dan siempre el mismo resultado.
@@ -77,6 +78,27 @@ historial, comprobante, lotes vencidos, proveedores, áreas, usuarios, mi cuenta
 pantalla espera que terminen las cargas y las animaciones, corre **axe-core** con las reglas WCAG
 2.0/2.1 A y AA y **falla si hay violaciones serias o críticas**; después guarda la captura en
 `docs/capturas/`. También falla si aparece algún error en la consola del navegador.
+
+## 7.5 bis Recorrido de ABM de punta a punta
+
+`frontend/e2e/recorrido-completo.spec.ts` usa el sistema como una persona, contra el backend real:
+
+| Escenario | Qué verifica |
+|---|---|
+| Áreas | Crear, nombre repetido (sin distinguir mayúsculas), buscar, editar, dar de baja, ver inactivas y reactivar. |
+| Proveedores | CUIT inválido rechazado, crear, editar teléfono y correo, dar de baja y reactivar. |
+| Medicamentos | Crear (el código se guarda en mayúsculas), código repetido, editar el stock mínimo. |
+| Ingreso de mercadería | Fecha vencida rechazada, aviso de vencimiento cercano, dos lotes, stock resultante, lote repetido. |
+| Transferencia | FEFO (30 del lote que vence antes + 20 del siguiente), observaciones en el comprobante; otra persona ajusta el stock mientras tanto y la transferencia se rechaza con "Disponible: 5 (pediste 10)" sin descontar nada. |
+| Baja de medicamento | Rechazada con stock; aceptada después de ajustar a 0; reactivación. Movimientos de ingreso, egreso y ajuste en el detalle. |
+| Lote vencido | Baja por vencimiento con motivo (se saltea si la demo ya no tiene lotes vencidos). |
+| Usuarios | Alta, cambio de rol, restablecer contraseña, permisos del rol Consulta (sin botones, "Sin permiso" en /usuarios), cambio de contraseña propia con la actual incorrecta y correcta, desactivación con efecto inmediato sobre una sesión abierta, activación y recuperación de contraseña con código incorrecto y correcto. |
+| Propio usuario | No se ofrece desactivarse a sí mismo. |
+
+Errores reales que encontró y se corrigieron: la sesión se cerraba si la validación inicial fallaba
+por un problema de red o por recargar la página a mitad del pedido (ahora solo se cierra ante un
+401; en los demás casos se ofrece "Reintentar"), y la casilla "Incluir inactivos" tardaba en
+marcarse mientras se recargaba la lista.
 
 ## 7.6 Matriz de trazabilidad
 

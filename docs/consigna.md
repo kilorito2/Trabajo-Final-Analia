@@ -28,7 +28,7 @@ Cada requisito obligatorio, dónde está resuelto y cómo se verifica.
 | Arquitectura con separación de responsabilidades | Backend en capas por funcionalidad: Controller (sin lógica) → Service (`@Transactional`) → Repository → Entidad, con DTO `record`. Frontend: `api/` (único lugar que llama a `fetch`), `hooks/`, `components/` reutilizables y `pages/`. |
 | Código modular y reutilizable | Ejemplos: `Reporte` + `Exportador` generan CSV y PDF para todos los reportes; `Tabla`, `CampoFormulario`, `useFormulario` y `useDescarga` en el front. |
 | Manejo de errores y excepciones | `ManejadorErrores`: todo error sale como ProblemDetail con `codigo`; el 500 tiene `errorId` y no expone el stacktrace. El front muestra los errores debajo de cada campo o como aviso. |
-| Código ordenado y claro | Spotless + google-java-format en `verify`; ESLint, Prettier, TypeScript estricto y knip en el front. 100 tests en el backend y 99 en el front. |
+| Código ordenado y claro | Spotless + google-java-format en `verify`; ESLint, Prettier, TypeScript estricto y knip en el front. 100 tests en el backend y 101 en el front, más un recorrido de punta a punta de todos los ABM. |
 
 ## Reportes (excluyente)
 

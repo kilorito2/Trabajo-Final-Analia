@@ -57,6 +57,13 @@ npm run build       # genera dist/
 
 La imagen Docker compila con Node y sirve `dist/` con nginx sin root en el puerto 8080. nginx hace de proxy de `/api` al servicio `api` y manda la CSP y las cabeceras de seguridad.
 
+## Recorrido de punta a punta
+
+Con la app levantada contra el backend en modo demo, `npm run e2e:recorrido` crea, edita, busca, da
+de baja y reactiva en todas las pantallas y prueba los errores y los permisos. Modifica los datos
+demo (todo lo que crea lleva el mismo sufijo numérico). Usa `CAPTURAS_USUARIO` y `CAPTURAS_PASSWORD`
+igual que las capturas.
+
 ## Capturas para el informe
 
 Con la app levantada (`npm run dev` más el backend en modo demo, o el backend simulado), la primera vez:

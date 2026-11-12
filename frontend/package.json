@@ -18,7 +18,8 @@
     "knip": "knip",
     "api:tipos": "openapi-typescript http://localhost:8080/v3/api-docs -o src/api/esquema.ts",
     "api:tipos:provisorio": "openapi-typescript contrato/openapi-provisorio.yaml -o src/api/esquema.ts",
-    "capturas": "playwright test"
+    "capturas": "playwright test capturas",
+    "e2e:recorrido": "playwright test recorrido-completo"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "^5.3.0",

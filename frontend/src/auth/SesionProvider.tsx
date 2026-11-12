@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { useQueryClient } from '@tanstack/react-query';
 import { obtenerUsuarioActual } from '../api/auth';
 import { configurarCliente } from '../api/cliente';
-import { MENSAJES } from '../api/errores';
+import { ErrorApi, MENSAJES, mensajeDeError } from '../api/errores';
 import type { LoginResponse, Permiso, UsuarioSesion } from '../api/tipos';
 import { useAvisos } from '../components/Avisos';
 import { formatearHora } from '../utils/fechas';
@@ -31,6 +31,8 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   const [expiraEn, setExpiraEn] = useState<string | null>(null);
   const [validando, setValidando] = useState(() => leerSesion() !== null);
   const [motivoSalida, setMotivoSalida] = useState<MotivoSalida>(null);
+  const [errorValidacion, setErrorValidacion] = useState<string | null>(null);
+  const [intento, setIntento] = useState(0);
 
   // El cliente no conoce el router: se le pasan estos callbacks. Al expirar no se navega
   // desde acá: RutaProtegida redirige al ingreso (con el motivo) en cuanto no hay usuario.
@@ -61,13 +63,25 @@ export function SesionProvider({ children }: { children: ReactNode }) {
         setUsuario(actual);
         setExpiraEn(guardada.expiraEn);
       })
-      .catch(() => borrarSesionGuardada())
+      .catch((error: unknown) => {
+        // Un 401 ya lo resolvió el cliente (borra la sesión y avisa que expiró). Ante una falla de
+        // red o del servidor, o una recarga a mitad del pedido, la sesión puede seguir siendo
+        // válida: no se borra y se ofrece reintentar.
+        const sesionInvalida = error instanceof ErrorApi && error.status === 401;
+        if (vigente && !sesionInvalida) setErrorValidacion(mensajeDeError(error));
+      })
       .finally(() => {
         if (vigente) setValidando(false);
       });
     return () => {
       vigente = false;
     };
+  }, [intento]);
+
+  const reintentarValidacion = useCallback(() => {
+    setErrorValidacion(null);
+    setValidando(true);
+    setIntento((n) => n + 1);
   }, []);
 
   // Sin chequeos periódicos: un único temporizador avisa 5 minutos antes del vencimiento.
@@ -116,6 +130,19 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     return (
       <div className="pantalla-carga" role="status">
         Cargando…
+      </div>
+    );
+  }
+
+  if (errorValidacion) {
+    return (
+      <div className="pantalla-carga">
+        <div className="estado-error" role="alert">
+          <p>{errorValidacion}</p>
+          <button type="button" className="boton" onClick={reintentarValidacion}>
+            Reintentar
+          </button>
+        </div>
       </div>
     );
   }
