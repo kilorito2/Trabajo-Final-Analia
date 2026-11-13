@@ -128,6 +128,51 @@
   }
 }
 
+/* Un ingreso rechazado sacude el mensaje, como quien niega con la cabeza: se nota aunque el
+   texto sea el mismo que en el intento anterior. Amplitud que decrece para que no rebote. */
+@keyframes sacudir {
+  20% {
+    transform: translateX(calc(-6px * var(--movimiento)));
+  }
+  40% {
+    transform: translateX(calc(5px * var(--movimiento)));
+  }
+  60% {
+    transform: translateX(calc(-3px * var(--movimiento)));
+  }
+  80% {
+    transform: translateX(calc(2px * var(--movimiento)));
+  }
+}
+
+.mensaje--sacudir {
+  animation: sacudir 300ms ease-out;
+}
+
+/* ---------- Buscador de medicamentos ---------- */
+
+/* La lista sale del campo: crece hacia abajo desde su borde superior. */
+.combobox__lista:not([hidden]) {
+  transform-origin: top center;
+  transition:
+    opacity var(--duracion-corta) var(--curva-salida),
+    transform var(--duracion) var(--curva-salida);
+}
+
+@starting-style {
+  .combobox__lista:not([hidden]) {
+    opacity: 0;
+    transform: translateY(calc(-4px * var(--movimiento))) scale(calc(1 - 0.02 * var(--movimiento)));
+  }
+}
+
+/* ---------- Nueva transferencia ---------- */
+
+/* La fila agregada entra sola, así se ve dónde cayó el medicamento recién elegido. */
+.lineas > tr {
+  animation: entrar var(--duracion-larga) var(--curva-salida) backwards;
+}
+
 /* ---------- Menú lateral en pantallas angostas ---------- */
 
 @media (max-width: 1099px) {

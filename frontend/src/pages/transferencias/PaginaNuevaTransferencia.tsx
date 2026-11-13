@@ -304,7 +304,7 @@ export function PaginaNuevaTransferencia() {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="lineas">
                   {lineas.map((linea) => {
                     const faltante = faltantes[linea.medicamentoId];
                     const mostrarError = intentoConfirmar || lineasTocadas.has(linea.medicamentoId);

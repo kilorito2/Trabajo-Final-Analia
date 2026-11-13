@@ -27,6 +27,9 @@ export function PaginaIngreso() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [enviando, setEnviando] = useState(false);
+  // Cambia en cada intento fallido: como key, remonta el mensaje y repite la sacudida
+  // aunque el texto del error sea el mismo.
+  const [intentosFallidos, setIntentosFallidos] = useState(0);
   const recuperada = parametros.get('motivo') === 'recuperada';
   const [error, setError] = useState<string | null>(
     parametros.get('motivo') === 'expirada' ? MENSAJES.sesionExpirada : null,
@@ -39,6 +42,7 @@ export function PaginaIngreso() {
     if (enviando) return;
     if (!username.trim() || !password) {
       setError('Ingresá tu usuario y tu contraseña.');
+      setIntentosFallidos((n) => n + 1);
       return;
     }
     setEnviando(true);
@@ -49,6 +53,7 @@ export function PaginaIngreso() {
       navegar(destinoGuardado(ubicacion.state), { replace: true });
     } catch (causa) {
       setError(mensajeDeError(causa));
+      setIntentosFallidos((n) => n + 1);
       setEnviando(false);
     }
   }
@@ -67,7 +72,11 @@ export function PaginaIngreso() {
           </p>
         )}
         {error && (
-          <p className="mensaje mensaje--peligro" role="alert">
+          <p
+            key={intentosFallidos}
+            className={`mensaje mensaje--peligro${intentosFallidos > 0 ? ' mensaje--sacudir' : ''}`}
+            role="alert"
+          >
             {error}
           </p>
         )}
