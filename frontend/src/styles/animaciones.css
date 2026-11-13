@@ -166,6 +166,40 @@
   }
 }
 
+/* ---------- Listas desplegables (select) ---------- */
+
+/* Abre igual que la del buscador y al cerrar se desvanece más rápido: la salida no debe
+   demorar lo que se eligió. display y overlay discretos la mantienen visible mientras sale. */
+@supports (appearance: base-select) {
+  select.control::picker(select) {
+    transform-origin: top center;
+    opacity: 0;
+    transform: translateY(calc(-4px * var(--movimiento))) scale(calc(1 - 0.02 * var(--movimiento)));
+    transition:
+      opacity var(--duracion-corta) ease-in,
+      transform var(--duracion-corta) ease-in,
+      display var(--duracion-corta) allow-discrete,
+      overlay var(--duracion-corta) allow-discrete;
+  }
+
+  select.control:open::picker(select) {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--duracion-corta) var(--curva-salida),
+      transform var(--duracion) var(--curva-salida),
+      display var(--duracion) allow-discrete,
+      overlay var(--duracion) allow-discrete;
+  }
+
+  @starting-style {
+    select.control:open::picker(select) {
+      opacity: 0;
+      transform: translateY(calc(-4px * var(--movimiento))) scale(calc(1 - 0.02 * var(--movimiento)));
+    }
+  }
+}
+
 /* ---------- Nueva transferencia ---------- */
 
 /* La fila agregada entra sola, así se ve dónde cayó el medicamento recién elegido. */
