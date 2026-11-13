@@ -26,9 +26,16 @@ services:
       DB_URL: jdbc:postgresql://db:5432/farmacia
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
     ports:
-      - "127.0.0.1:8080:8080"
+      # Cambialo con API_PUERTO si el 8080 ya está ocupado.
+      - "127.0.0.1:${API_PUERTO:-8080}:8080"
 
-  # El servicio web lo agrega el prompt del frontend.
+  # nginx sirve el frontend y reenvía /api/ al servicio api por la red interna (sin CORS).
+  web:
+    build: ./frontend
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:${WEB_PUERTO:-8081}:8080"
 
 volumes:
   farmacia-db:
