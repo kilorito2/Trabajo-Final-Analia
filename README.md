@@ -11,8 +11,7 @@ Tecnicatura Universitaria en Programación (UTN).
 |---|---|
 | `backend/` | API REST en Spring Boot 4.1 y Java 21, con PostgreSQL 16 y Flyway. |
 | `frontend/` | Interfaz en React 19 y TypeScript (Vite), servida por nginx en Docker. Ver su [README](frontend/README.md). |
-| `docs/` | Documentación de trabajo: especificaciones, decisiones, modelo de datos, presupuesto y capturas. |
-| `documentos/` | Lo que se entrega del TFI: informe final, carpeta del proyecto, manual, guion de la defensa y sus PDF. |
+| `documentos/pdf/` | Lo que se entrega del TFI en PDF: informe final, carpeta del proyecto, manual de usuario, guion de la defensa y carpeta de estudio. |
 
 ## Requisitos
 
@@ -106,12 +105,6 @@ El CI (`.github/workflows/ci.yml`) corre las dos partes en cada push.
 
 - Swagger UI (perfiles `dev` y `demo`): http://localhost:8080/swagger-ui.html
 - OpenAPI: http://localhost:8080/v3/api-docs
-- Pedidos listos para probar: `docs/api/farmacia.http`
-- Especificación y criterios de aceptación: `docs/spec.md`
-- Decisiones de diseño: `docs/decisiones.md`
-- Modelo de datos (diagrama entidad-relación y 3FN): `docs/modelo-datos.md`
-- Cumplimiento de la consigna del TFI: `docs/consigna.md`
-- Mejora propuesta y presupuesto: `docs/presupuesto.md`
 
 Documentación para la entrega del TFI (informe final, carpeta del proyecto, manual de usuario,
-guion de la defensa y carpeta de estudio): [`documentos/`](documentos/README.md).
+guion de la defensa y carpeta de estudio), en PDF: [`documentos/pdf/`](documentos/pdf/).

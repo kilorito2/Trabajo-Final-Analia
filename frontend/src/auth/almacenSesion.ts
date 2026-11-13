@@ -1,7 +1,7 @@
 // La sesión vive en sessionStorage y no en localStorage: se borra al cerrar la pestaña,
 // así que en una PC compartida del hospital no queda abierta para la siguiente persona.
 // Es accesible desde JavaScript; el riesgo de XSS se mitiga con la CSP de nginx y
-// porque nunca se usa innerHTML (ver la sección Frontend de docs/decisiones.md).
+// porque nunca se usa innerHTML.
 // El usuario no se guarda: al recargar se pide de nuevo a /api/auth/me con permisos frescos.
 const CLAVE = 'farmacia.sesion';
 
