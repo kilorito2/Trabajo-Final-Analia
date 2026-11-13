@@ -173,6 +173,32 @@
   animation: entrar var(--duracion-larga) var(--curva-salida) backwards;
 }
 
+/* ---------- Logo ---------- */
+
+/* En la pantalla de ingreso la cruz se dibuja trazo por trazo, en el sentido del giro. */
+@keyframes dibujar {
+  from {
+    stroke-dashoffset: var(--movimiento);
+  }
+}
+
+.ingreso__tarjeta .logo__trazo {
+  stroke-dasharray: 1;
+  animation: dibujar 520ms var(--curva-salida) backwards;
+}
+
+.ingreso__tarjeta .logo__trazo:nth-of-type(2) {
+  animation-delay: 90ms;
+}
+
+.ingreso__tarjeta .logo__trazo:nth-of-type(3) {
+  animation-delay: 180ms;
+}
+
+.ingreso__tarjeta .logo__trazo:nth-of-type(4) {
+  animation-delay: 270ms;
+}
+
 /* ---------- Menú lateral en pantallas angostas ---------- */
 
 @media (max-width: 1099px) {

@@ -1,16 +1,26 @@
 /* ---------- Marca ---------- */
 
-.logo__anillo {
-  fill: none;
-  stroke: rgb(255 255 255 / 0.45);
+.logo__placa {
+  fill: #fff;
+  stroke: var(--color-borde);
   stroke-width: 1;
 }
 
-.logo__cruz {
-  fill: #fff;
+/* Dos tonos de la paleta, como el azul y el verde de una cruz de farmacia. */
+.logo__trazo {
+  fill: none;
+  stroke-width: 2.4;
 }
 
-/* Sombra suave: sobre el menú oscuro el escudo se despega del fondo. */
+.logo__trazo--oscuro {
+  stroke: var(--color-primario);
+}
+
+.logo__trazo--claro {
+  stroke: var(--color-acento);
+}
+
+/* Sombra suave: sobre el menú oscuro la placa se despega del fondo. */
 .marca .logo {
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.25));
 }
