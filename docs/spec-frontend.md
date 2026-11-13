@@ -1,12 +1,12 @@
 # Spec — Frontend de la Farmacia Hospitalaria
 
-Fuentes: `Front_v2.md` (requisitos del front) y `Back_v2.md` §8–9 (contrato de la API). Si esta spec y el contrato no coinciden, manda el contrato; la diferencia se anota en `docs/decisiones-frontend.md` y se avisa.
+Fuentes: `Front_v2.md` (requisitos del front) y `Back_v2.md` §8–9 (contrato de la API). Si esta spec y el contrato no coinciden, manda el contrato; la diferencia se anota en `docs/decisiones.md` (sección Frontend) y se avisa.
 
 ## Supuestos
 
 1. El backend expone el OpenAPI en `http://localhost:8080/v3/api-docs` (perfiles `dev`/`demo`). Hasta que exista, solo se construye lo que no depende de sus tipos (rebanadas 1 y 3, utilidades y cliente de API).
 2. Los nombres de los schemas generados (`MedicamentoResponse`, `PagedModel…`) pueden diferir de los de §8.3; `src/api/tipos.ts` es la única capa que los nombra.
-3. El monorepo lo crea el backend. Hasta fusionar, el front vive en `frontend/` y sus decisiones en `docs/decisiones-frontend.md`.
+3. El front vive en `frontend/` y sus decisiones en `docs/decisiones.md` (sección Frontend).
 4. Navegadores de escritorio actuales (Chrome/Edge) en Windows. Resolución objetivo 1366×768; mínimo usable 1024 px.
 
 ## Objetivo

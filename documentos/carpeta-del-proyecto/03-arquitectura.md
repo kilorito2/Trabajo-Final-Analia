@@ -153,8 +153,8 @@ guarda el reporte de cobertura de JaCoCo.
 
 ## 3.7 Decisiones de arquitectura
 
-El registro completo, con alternativas y motivos, está en `docs/decisiones.md` y
-`docs/decisiones-frontend.md`. Las más importantes:
+El registro completo, con alternativas y motivos, está en `docs/decisiones.md`
+(backend y, al final, frontend). Las más importantes:
 
 | Decisión | Alternativa descartada | Por qué |
 |---|---|---|

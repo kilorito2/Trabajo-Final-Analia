@@ -16,5 +16,5 @@ Documentación técnica del Sistema de Gestión de Stock para la Farmacia Hospit
 | 10 | [Glosario](10-glosario.md) | Términos del negocio y técnicos. |
 
 Documentos de trabajo originales (con más detalle de cada decisión): `docs/spec.md`,
-`docs/spec-frontend.md`, `docs/decisiones.md`, `docs/decisiones-frontend.md`,
+`docs/spec-frontend.md`, `docs/decisiones.md`,
 `docs/modelo-datos.md`, `docs/presupuesto.md`, `docs/consigna.md` y `docs/api/farmacia.http`.

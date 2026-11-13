@@ -26,9 +26,9 @@ $env:VITE_API_URL = "http://otro-servidor:8080"; npm run dev
 VITE_API_URL=http://otro-servidor:8080 npm run dev
 ```
 
-### Backend simulado (provisorio)
+### Backend simulado
 
-Mientras el backend real no existe, `npm run mock` levanta en el puerto 8080 un servidor con datos en memoria que respeta el contrato (`contrato/openapi-provisorio.yaml`). Usuarios: `admin`, `farmaceutico` y `consulta`, todos con la contraseña `demo1234`. Los datos se reinician cada vez que arranca. Se borra cuando el backend esté listo.
+Para trabajar en las pantallas sin levantar Java ni la base, `npm run mock` levanta en el puerto 8080 un servidor con datos en memoria que respeta el contrato (`contrato/openapi-provisorio.yaml`). Usuarios: `admin`, `farmaceutico` y `consulta`, todos con la contraseña `demo1234`. Los datos se reinician cada vez que arranca. Si el 8080 está ocupado: `PUERTO_MOCK=8090 npm run mock` y `API_DESTINO=http://localhost:8090 npm run dev`. No entra en el build ni en la imagen Docker.
 
 ## Tipos de la API
 
@@ -36,7 +36,7 @@ Los tipos salen del OpenAPI del backend (con el backend levantado en `dev` o `de
 
 ```bash
 npm run api:tipos              # regenera src/api/esquema.ts; no se edita a mano
-npm run api:tipos:provisorio   # mientras tanto, desde el contrato provisorio
+npm run api:tipos:provisorio   # desde el contrato del mock, sin levantar el backend
 ```
 
 ## Calidad

@@ -48,14 +48,19 @@ $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create
 
 > El archivo `.env` tiene secretos: **nunca** se sube al repositorio (está en `.gitignore`).
 
-## 8.4 Levantar la base y el backend
+## 8.4 Levantar todo con Docker
 
 ```bash
 docker compose up --build
 ```
 
-- La primera vez descarga las imágenes y compila el backend (varios minutos).
+Levanta tres servicios: la base (`db`), la API (`api`) y la aplicación web (`web`).
+
+- La primera vez descarga las imágenes y compila el backend y el frontend (varios minutos).
+- La aplicación queda en http://localhost:8081.
 - Cuando aparece `Started FarmaciaApplication`, la API está en http://localhost:8080.
+- Si alguno de esos puertos ya está ocupado, se cambian en `.env` con `API_PUERTO`, `WEB_PUERTO` y
+  `DB_PUERTO`.
 - Verificación: http://localhost:8080/actuator/health → `{"status":"UP"}`.
 - Swagger (perfil demo): http://localhost:8080/swagger-ui.html.
 
@@ -88,19 +93,8 @@ docker build -t farmacia-web .
 ```
 
 La imagen (`nginxinc/nginx-unprivileged`) sirve `dist/` en el puerto 8080 del contenedor, reenvía
-`/api/` al servicio `api` y agrega las cabeceras de seguridad. Para integrarla al compose se agrega
-un servicio `web` en la misma red que `api`, por ejemplo:
-
-```yaml
-  web:
-    build: ./frontend
-    depends_on:
-      - api
-    ports:
-      - "8081:8080"
-```
-
-y se entra por http://localhost:8081. Para publicar en la red del hospital conviene poner HTTPS
+`/api/` al servicio `api` y agrega las cabeceras de seguridad. Es el servicio `web` de
+`docker-compose.yml` (sección 8.4), que la construye solo. Para publicar en la red del hospital conviene poner HTTPS
 (certificado del hospital) en un proxy delante de `web`.
 
 ## 8.6 Usuarios iniciales

@@ -289,7 +289,7 @@ Prácticas aplicadas:
 - **Desarrollo guiado por pruebas (TDD)** en la lógica crítica: FEFO, alertas, validación de CUIT
   y reglas del lote. Primero se escribe la prueba que falla y después el código.
 - **Registro de decisiones:** cada decisión de diseño se anotó con su justificación en el momento
-  (`docs/decisiones.md`, `docs/decisiones-frontend.md`).
+  (`docs/decisiones.md`).
 - **Commits chicos** con el formato *Conventional Commits* y descripción en español
   (`feat(transferencia): descontar stock con criterio FEFO`).
 - **Integración continua** con GitHub Actions: cada cambio subido compila y corre todas las pruebas.
@@ -802,4 +802,4 @@ instalación, planificación y glosario.
 
 ### Anexo D: Registro de decisiones
 
-`docs/decisiones.md` (backend) y `docs/decisiones-frontend.md` (frontend).
+`docs/decisiones.md`: primero las del backend y al final, en la sección Frontend, las de la interfaz.
