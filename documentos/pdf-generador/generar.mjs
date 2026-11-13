@@ -14,12 +14,15 @@ const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const DOCUMENTOS = path.resolve(AQUI, '..');
 const SALIDA = path.join(DOCUMENTOS, 'pdf');
 const MERMAID = path.join(AQUI, 'node_modules', 'mermaid', 'dist', 'mermaid.min.js');
-// El mismo escudo que el logo del sistema (frontend/public/favicon.svg).
-const ESCUDO = `<svg viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="escudo" x1="0" y1="0" x2="1" y2="1">
-  <stop offset="0" stop-color="#1bb5a9"/><stop offset="1" stop-color="#0a6170"/></linearGradient></defs>
-  <path fill="url(#escudo)" d="M20 2 35 7.5V19c0 9.4-6.4 16.4-15 19C11.4 35.4 5 28.4 5 19V7.5Z"/>
-  <path fill="none" stroke="#fff" stroke-opacity=".45" d="M20 5.2 32 9.6V19c0 7.8-5.2 13.7-12 16-6.8-2.3-12-8.2-12-16V9.6Z"/>
-  <rect fill="#fff" x="16.5" y="10" width="7" height="18" rx="1.6"/><rect fill="#fff" x="11" y="15.5" width="18" height="7" rx="1.6"/></svg>`;
+// El mismo logo que el sistema (frontend/public/favicon.svg): cruz de brazos entrelazados.
+const LOGO = `<svg viewBox="0 0 40 40" aria-hidden="true">
+  <rect fill="#fff" stroke="#dfe6ec" x="0.5" y="0.5" width="39" height="39" rx="9.5"/>
+  <g fill="none" stroke-width="2.4">
+    <path stroke="#0a6170" d="M16.4 13.6V10.6A3.6 3.6 0 0 1 23.6 10.6V17.6"/>
+    <path stroke="#13a39a" d="M26.4 16.4H29.4A3.6 3.6 0 0 1 29.4 23.6H22.4"/>
+    <path stroke="#13a39a" d="M23.6 26.4V29.4A3.6 3.6 0 0 1 16.4 29.4V22.4"/>
+    <path stroke="#0a6170" d="M13.6 23.6H10.6A3.6 3.6 0 0 1 10.6 16.4H17.6"/>
+  </g></svg>`;
 const SUBTITULO = 'Sistema de Gestión de Stock — Farmacia Hospitalaria';
 
 const carpeta = (dir, nombres) => nombres.map((n) => `${dir}/${n}`);
@@ -28,14 +31,15 @@ const PDFS = [
   {
     salida: '01-informe-final.pdf',
     titulo: 'Informe final',
-    portada: false,
+    // El bloque antes del primer --- (título, datos del autor) es la portada.
+    portadaDesdeMarkdown: true,
     archivos: ['tesis/informe-final.md'],
   },
   {
     salida: '02-carpeta-del-proyecto.pdf',
     titulo: 'Carpeta del proyecto',
-    descripcion: 'Documentación técnica: requisitos, casos de uso, arquitectura, datos, API, seguridad, pruebas, instalación, planificación y presupuesto.',
-    portada: true,
+    descripcion:
+      'Documentación técnica: requisitos, casos de uso, arquitectura, datos, API, seguridad, pruebas, instalación, planificación y presupuesto.',
     archivos: carpeta('carpeta-del-proyecto', [
       '01-relevamiento-y-requisitos.md',
       '02-casos-de-uso.md',
@@ -50,24 +54,21 @@ const PDFS = [
     ]),
   },
   {
-    salida: '03-manual-de-usuario.pdf',
+    salida: 'manual-de-usuario.pdf',
     titulo: 'Manual de usuario',
     descripcion: 'Cómo usar el sistema pantalla por pantalla.',
-    portada: true,
     archivos: ['manual-de-usuario/manual-de-usuario.md'],
   },
   {
     salida: '04-guion-de-defensa.pdf',
     titulo: 'Guion de la defensa',
     descripcion: 'Presentación, demostración en vivo y preguntas probables del tribunal.',
-    portada: true,
     archivos: ['defensa/guion-de-defensa.md'],
   },
   {
     salida: '05-carpeta-de-estudio.pdf',
     titulo: 'Carpeta de estudio',
     descripcion: 'Todo el proyecto explicado desde cero, con el código real.',
-    portada: true,
     archivos: carpeta('estudio', [
       '00-como-usar-esta-carpeta.md',
       '01-el-proyecto-en-un-vistazo.md',
@@ -117,7 +118,7 @@ function convertir(markdown, archivo, pdf) {
   const prefijo = combinado ? `${clave}--` : '';
   const directorio = path.posix.dirname(archivo);
   const usados = new Map();
-  let primerTitulo = null;
+  const titulos = [];
 
   const marked = new Marked({ gfm: true });
   marked.use({
@@ -128,11 +129,12 @@ function convertir(markdown, archivo, pdf) {
         const veces = usados.get(id) ?? 0;
         usados.set(id, veces + 1);
         if (veces) id = `${id}-${veces}`;
-        if (depth === 1 && !primerTitulo) primerTitulo = { texto: text.replace(/[`*]/g, ''), id };
+        if (depth <= 3) titulos.push({ nivel: depth, id, html });
         return `<h${depth} id="${id}">${html}</h${depth}>\n`;
       },
       code({ text, lang }) {
-        if (lang === 'mermaid') return `<div class="diagrama"><pre class="mermaid">${escapar(text)}</pre></div>\n`;
+        if (lang === 'mermaid')
+          return `<div class="diagrama"><pre class="mermaid">${escapar(text)}</pre></div>\n`;
         return `<pre><code>${escapar(text)}</code></pre>\n`;
       },
       link({ href, tokens }) {
@@ -160,7 +162,7 @@ function convertir(markdown, archivo, pdf) {
   let html = marked.parse(markdown);
   // En papel no se puede hacer clic: las respuestas plegadas se muestran abiertas.
   html = html.replace(/<details>/g, '<details open>');
-  return { html: `<section class="documento" id="doc-${clave}">${html}</section>`, titulo: primerTitulo };
+  return { html: `<section class="documento" id="doc-${clave}">${html}</section>`, titulos };
 }
 
 const ESTILOS = `
@@ -208,36 +210,85 @@ input[type=checkbox] { margin-right: 4pt; }
 .portada .sub { font-size: 14pt; color: #0a6170; margin: 0 0 18pt; }
 .portada .desc { font-size: 11pt; color: #4d5d6b; max-width: 140mm; }
 .portada .pie { margin-top: 80pt; font-size: 10pt; color: #4d5d6b; border-top: 1pt solid #dfe6ec; padding-top: 10pt; }
+.portada .datos { font-size: 11pt; color: #14232e; max-width: 150mm; }
+.portada .datos p { margin: 0 0 4pt; }
+.portada .datos table { margin-top: 24pt; font-size: 10pt; }
 .indice { break-after: page; page-break-after: always; }
-.indice ol { padding-left: 16pt; font-size: 11pt; }
-.indice li { margin: 4pt 0; }
+.indice ul { list-style: none; padding: 0; margin: 12pt 0 0; font-size: 11pt; }
+.indice li { display: flex; align-items: baseline; gap: 4pt; margin: 5pt 0; break-inside: avoid; }
+.indice li.nivel-3 { padding-left: 14pt; font-size: 10pt; margin: 3pt 0; color: #4d5d6b; }
+.indice li.nivel-3 a { color: #4d5d6b; }
+.indice .relleno { flex: 1; border-bottom: 1pt dotted #b9c6cf; transform: translateY(-3pt); }
+.indice .pagina { min-width: 18pt; text-align: right; font-variant-numeric: tabular-nums; }
 `;
 
-function portada(pdf) {
-  return `<section class="portada">
-    <div class="marca">${ESCUDO}Farmacia Hospitalaria</div>
-    <h1>${pdf.titulo}</h1>
+/** El índice escrito a mano en el Markdown se reemplaza por el que arma el generador. */
+function quitarIndiceEscrito(markdown) {
+  return markdown.replace(/^## (Índice|Contenido)\n[\s\S]*?\n---\n/m, '');
+}
+
+/** Separa el bloque anterior al primer --- (título y datos del autor) para usarlo de portada. */
+function separarPortada(markdown) {
+  const corte = markdown.search(/^---$/m);
+  const cabeza = markdown.slice(0, corte);
+  const titulo = cabeza.match(/^# (.+)$/m)[1];
+  // breaks: en la portada cada renglón del Markdown es un renglón (título del trabajo, carrera).
+  const datos = new Marked({ gfm: true, breaks: true }).parse(cabeza.replace(/^# .+$/m, ''));
+  return { titulo, datos, resto: markdown.slice(corte).replace(/^---\n/, '') };
+}
+
+function portada(pdf, cabeza) {
+  const cuerpo = cabeza
+    ? `<h1>${escapar(cabeza.titulo)}</h1><div class="datos">${cabeza.datos}</div>`
+    : `<h1>${pdf.titulo}</h1>
     <p class="sub">${SUBTITULO}</p>
     ${pdf.descripcion ? `<p class="desc">${pdf.descripcion}</p>` : ''}
-    <div class="pie">Trabajo Final Integrador — Tecnicatura Universitaria en Programación — UTN<br>Noviembre de 2026</div>
+    <div class="pie">Trabajo Final Integrador — Tecnicatura Universitaria en Programación — UTN<br>Noviembre de 2026</div>`;
+  return `<section class="portada">
+    <div class="marca">${LOGO}Farmacia Hospitalaria</div>
+    ${cuerpo}
   </section>`;
 }
 
-function indice(titulos) {
-  const items = titulos.map((t) => `<li><a href="#${t.id}">${escapar(t.texto)}</a></li>`).join('');
-  return `<section class="indice"><h1>Índice</h1><ol>${items}</ol></section>`;
+/**
+ * Qué entra en el índice: en los PDF que juntan varios documentos, el título de cada uno; en los
+ * de un solo documento, sus secciones (##) y, si son pocas, también las subsecciones (###).
+ */
+function entradasDelIndice(pdf, titulos) {
+  if (pdf.archivos.length > 1) return titulos.filter((t) => t.nivel === 1);
+  const secciones = titulos.filter((t) => t.nivel === 2);
+  return secciones.length >= 6 ? secciones : titulos.filter((t) => t.nivel === 2 || t.nivel === 3);
+}
+
+// El número de página se completa en la segunda pasada (ver numerarIndice).
+function indice(entradas) {
+  const items = entradas
+    .map(
+      (t) =>
+        `<li class="nivel-${t.nivel}"><a href="#${t.id}">${t.html}</a><span class="relleno"></span>` +
+        `<span class="pagina" data-destino="${t.id}"></span></li>`,
+    )
+    .join('');
+  return `<section class="indice"><h1>Índice</h1><ul>${items}</ul></section>`;
 }
 
 async function armarHtml(pdf) {
   const partes = [];
   const titulos = [];
+  let cabeza = null;
   for (const archivo of pdf.archivos) {
-    const markdown = await readFile(path.join(DOCUMENTOS, archivo), 'utf8');
-    const { html, titulo } = convertir(markdown, archivo, pdf);
-    partes.push(html);
-    if (titulo) titulos.push(titulo);
+    // Con autocrlf de Git en Windows los .md llegan con \r\n; las expresiones esperan \n.
+    const crudo = (await readFile(path.join(DOCUMENTOS, archivo), 'utf8')).replace(/\r\n/g, '\n');
+    let markdown = quitarIndiceEscrito(crudo);
+    if (pdf.portadaDesdeMarkdown) {
+      cabeza = separarPortada(markdown);
+      markdown = cabeza.resto;
+    }
+    const convertido = convertir(markdown, archivo, pdf);
+    partes.push(convertido.html);
+    titulos.push(...convertido.titulos);
   }
-  const cabecera = (pdf.portada ? portada(pdf) : '') + (pdf.archivos.length > 1 ? indice(titulos) : '');
+  const cabecera = portada(pdf, cabeza) + indice(entradasDelIndice(pdf, titulos));
   return `<!doctype html><html lang="es-AR"><head><meta charset="utf-8"><title>${pdf.titulo}</title>
     <style>${ESTILOS}</style><script src="${pathToFileURL(MERMAID).href}"></script>
     <script>mermaid.initialize({ startOnLoad: false });</script></head>
@@ -270,6 +321,99 @@ async function dibujarDiagramas(pagina) {
   });
 }
 
+// ---------- Números de página del índice ----------
+// Chromium no calcula en qué página cae cada título (no soporta target-counter). Se imprime una
+// vez, se leen los marcadores del PDF (cada uno apunta a la página de su título) y se imprime de
+// nuevo con los números. El índice no cambia de largo, así que las páginas no se corren.
+
+/** Chromium escribe los objetos del PDF en texto plano (sin flujos de objetos). */
+function objetosDelPdf(pdf) {
+  const texto = pdf.toString('latin1');
+  const objetos = new Map();
+  for (const m of texto.matchAll(/(\d+) 0 obj\n([\s\S]*?)\nendobj/g)) objetos.set(m[1], m[2]);
+  return { texto, objetos };
+}
+
+function decodificarTitulo(crudo) {
+  const hexa = crudo.match(/^<FEFF([0-9A-Fa-f]*)>$/);
+  if (hexa) {
+    let salida = '';
+    for (let i = 0; i < hexa[1].length; i += 4)
+      salida += String.fromCharCode(parseInt(hexa[1].slice(i, i + 4), 16));
+    return salida;
+  }
+  return crudo.slice(1, -1).replace(/\\([()\\])/g, '$1');
+}
+
+const normalizar = (texto) => texto.replace(/\s+/g, ' ').trim();
+
+// Chromium repite el texto en el marcador de los títulos que son destino de un enlace del PDF
+// ("ReactReact"): se compara contra la mitad.
+function sinRepetir(titulo) {
+  const mitad = titulo.length / 2;
+  return Number.isInteger(mitad) && titulo.slice(0, mitad) === titulo.slice(mitad) ? titulo.slice(0, mitad) : titulo;
+}
+
+/** Los marcadores en orden de lectura, cada uno con el número de página de su título. */
+function marcadoresDelPdf(pdf) {
+  const { texto, objetos } = objetosDelPdf(pdf);
+  const ref = (dic, clave) => dic.match(new RegExp(`/${clave} (\\d+) 0 R`))?.[1];
+
+  const paginas = [];
+  const recorrerPaginas = (id) => {
+    const dic = objetos.get(id);
+    if (/\/Type \/Pages\b/.test(dic)) {
+      for (const hijo of dic.match(/\/Kids \[([^\]]*)\]/)[1].matchAll(/(\d+) 0 R/g)) recorrerPaginas(hijo[1]);
+    } else paginas.push(id);
+  };
+  recorrerPaginas(texto.match(/\/Type \/Catalog[\s\S]*?\/Pages (\d+) 0 R/)[1]);
+  const numeroDe = new Map(paginas.map((id, i) => [id, i + 1]));
+
+  const marcadores = [];
+  const recorrer = (inicial) => {
+    for (let id = inicial; id; id = ref(objetos.get(id), 'Next')) {
+      const dic = objetos.get(id);
+      const titulo = dic.match(/\/Title (<[^>]*>|\((?:\\.|[^\\)])*\))/)?.[1];
+      const destino = dic.match(/\/Dest \[(\d+) 0 R/)?.[1];
+      if (titulo)
+        marcadores.push({ titulo: normalizar(decodificarTitulo(titulo)), pagina: numeroDe.get(destino) });
+      recorrer(ref(dic, 'First'));
+    }
+  };
+  recorrer(ref(objetos.get(texto.match(/\/Outlines (\d+) 0 R/)[1]), 'First'));
+  return marcadores;
+}
+
+/** Busca cada entrada del índice entre los marcadores, en orden, y le escribe su página. */
+async function numerarIndice(pagina, pdf) {
+  const marcadores = marcadoresDelPdf(pdf);
+  const entradas = await pagina.evaluate(() =>
+    [...document.querySelectorAll('.indice .pagina')].map((span) => ({
+      id: span.dataset.destino,
+      titulo: document.getElementById(span.dataset.destino).textContent,
+    })),
+  );
+  const numeros = {};
+  const faltantes = [];
+  let desde = 0;
+  for (const entrada of entradas) {
+    const buscado = normalizar(entrada.titulo);
+    const i = marcadores.findIndex((m, j) => j >= desde && sinRepetir(m.titulo) === buscado);
+    if (i === -1) {
+      faltantes.push(buscado);
+      continue;
+    }
+    numeros[entrada.id] = marcadores[i].pagina;
+    desde = i + 1;
+  }
+  await pagina.evaluate((numeros) => {
+    for (const span of document.querySelectorAll('.indice .pagina')) {
+      span.textContent = numeros[span.dataset.destino] ?? '';
+    }
+  }, numeros);
+  return faltantes;
+}
+
 const pieDePagina = (titulo) => `
   <div style="width:100%; font-size:7.5pt; color:#4d5d6b; padding:0 16mm; display:flex; justify-content:space-between; font-family:Segoe UI, Arial;">
     <span>${titulo} · ${SUBTITULO}</span>
@@ -290,19 +434,26 @@ async function main() {
       await pagina.goto(pathToFileURL(archivoHtml).href, { waitUntil: 'load' });
       const { total, errores } = await dibujarDiagramas(pagina);
       await pagina.evaluate(() => document.fonts.ready);
-      await pagina.pdf({
-        path: path.join(SALIDA, pdf.salida),
-        format: 'A4',
-        printBackground: true,
-        displayHeaderFooter: true,
-        headerTemplate: '<span></span>',
-        footerTemplate: pieDePagina(pdf.titulo),
-        margin: { top: '18mm', bottom: '20mm', left: '16mm', right: '16mm' },
-        outline: true,
-        tagged: true,
-      });
+      const imprimir = (destino) =>
+        pagina.pdf({
+          ...(destino && { path: destino }),
+          format: 'A4',
+          printBackground: true,
+          displayHeaderFooter: true,
+          headerTemplate: '<span></span>',
+          footerTemplate: pieDePagina(pdf.titulo),
+          margin: { top: '18mm', bottom: '20mm', left: '16mm', right: '16mm' },
+          outline: true,
+          tagged: true,
+        });
+      const faltantes = await numerarIndice(pagina, await imprimir());
+      await imprimir(path.join(SALIDA, pdf.salida));
       await pagina.close();
       console.log(`✓ ${pdf.salida} (${total} diagramas)`);
+      for (const titulo of faltantes) {
+        huboErrores = true;
+        console.error(`  ✗ sin número de página en el índice: ${titulo}`);
+      }
       for (const error of errores) {
         huboErrores = true;
         console.error(`  ✗ diagrama con error: ${error}`);

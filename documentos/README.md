@@ -35,15 +35,16 @@ docente o tutor, y fecha de entrega.
 
 ## PDF para entregar
 
-Los PDF ya generados están en [`pdf/`](pdf/):
+Los PDF ya generados están en [`pdf/`](pdf/). Todos empiezan igual: la página 1 es la portada, la
+2 es el índice con el número de página de cada sección, y desde la 3 sigue el contenido.
 
 | PDF | Contenido |
 |---|---|
-| `01-informe-final.pdf` | La tesis. |
-| `02-carpeta-del-proyecto.pdf` | Los 10 documentos técnicos en un solo archivo, con portada e índice. |
-| `03-manual-de-usuario.pdf` | Manual de usuario. |
+| `01-informe-final.pdf` | La tesis. La portada lleva los datos del autor del encabezado del informe. |
+| `02-carpeta-del-proyecto.pdf` | Los 10 documentos técnicos en un solo archivo. |
+| `manual-de-usuario.pdf` | Manual de usuario. |
 | `04-guion-de-defensa.pdf` | Guion de la presentación, la demo y las preguntas. |
-| `05-carpeta-de-estudio.pdf` | Los 18 archivos de estudio en un solo archivo, con portada e índice. |
+| `05-carpeta-de-estudio.pdf` | Los 18 archivos de estudio en un solo archivo. |
 
 **Después de editar un `.md`** (por ejemplo, al completar los `[COMPLETAR]`), regenerá los PDF:
 
